@@ -1,24 +1,25 @@
-# 🏬 Smart Mall DApp
+# Smart Mall DApp
 
-Một DApp giao dịch mô phỏng marketplace phi tập trung với token SML.
+**Telegram Web App** marketplace giả lập với token SML.
 
-## 🚀 Tính năng
+## Cấu trúc
 
-- 📢 Trang chủ hiển thị thông báo từ Admin
-- 🕒 Phiên giao dịch: Đăng ký, tham gia phiên, xem sản phẩm đang bán
-- 🧾 NFT của tôi: Theo dõi sản phẩm đã mua, thanh toán, chờ xác nhận
-- 💰 Ví SML: Hiển thị số dư và xử lý mua hàng
-- 👤 Quản lý thông tin cá nhân
+- `index.html`  
+- `style.css`  
+- `script.js`  
+- (tùy chọn) `assets/`
 
-## 🛠 Công nghệ
+## Chạy local
 
-- HTML, CSS, JavaScript (thuần)
-- Giao diện tương thích mobile
-- Có thể mở rộng Web3, Firebase, hoặc REST API
+1. Clone repo  
+2. Mở `index.html` bằng trình duyệt (https mới để Telegram init)
 
-## 💡 Hướng dẫn sử dụng
-
-1. Clone hoặc tải mã nguồn:
+## Deploy GitHub Pages
 
 ```bash
-git clone https://github.com/your-username/smart-mall-dapp.git
+git init
+git remote add origin https://github.com/ssadmall/smartmall-dapp.git
+git add .
+git commit -m "Deploy Smart Mall DApp"
+git branch -M main
+git push -u origin main
