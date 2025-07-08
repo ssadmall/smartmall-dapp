@@ -23,19 +23,21 @@ function handleLogin() {
   initApp();
 }
 
-// ===== Shared state =====
+// ===== State chung =====
 const state = {
   walletBalance: 100000,
-  registrations: [],   // [{date:'dd/MM',time:timestamp},…]
+  registrations: [],       // [{date:'dd/MM',time:timestamp},…]
   products: [
-    { id:'012345678901234567890123', name:'Tai nghe Bluetooth', price:50000, seller:'Admin' },
-    { id:'123456789012345678901234', name:'Quạt mini USB',     price:30000, seller:'Admin' },
-    { id:'234567890123456789012345', name:'Đèn học cảm ứng',    price:45000, seller:'Admin' }
+    {id:'012345678901234567890123',name:'Tai nghe Bluetooth',price:50000,seller:'Admin'},
+    {id:'123456789012345678901234',name:'Quạt mini USB',price:30000,seller:'Admin'},
+    {id:'234567890123456789012345',name:'Đèn học cảm ứng',price:45000,seller:'Admin'}
   ],
-  pendingSales: [],    // {id,name,salePrice,saleFee,sellDate}
-  depositRequests:[],
-  withdrawRequests:[],
-  userNFT: []          // {id,name,price,seller,status,(salePrice,saleFee,sellDate)}
+  pendingSales: [],        // {id,name,salePrice,saleFee,sellDate}
+  depositRequests: [],
+  withdrawRequests: [],
+  userNFT: [],             // {id,name,price,seller,status,...}
+  walletHistory: [],       // {desc,delta,time}
+  nftHistory: []           // {id,name,price,time}
 };
 
 let selectedDate = '';
@@ -51,6 +53,12 @@ function showSection(id){
 function updateWallet(){
   document.getElementById('walletBalance').innerText = fmt(state.walletBalance);
 }
+function addWalletHistory(desc, delta){
+  state.walletHistory.unshift({
+    desc, delta, time: new Date().toLocaleString('vi-VN')
+  });
+  renderWalletHistory();
+}
 
 // ===== Init App =====
 function initApp(){
@@ -60,6 +68,8 @@ function initApp(){
   renderPendingSales();
   renderRequestHistory();
   renderNFTs();
+  renderWalletHistory();
+  renderNFTHistory();
   // referral link
   const botUsername = 'SmartMallonebot';
   const startParam = new URLSearchParams(location.search).get('start')||'guest';
@@ -99,21 +109,25 @@ function updateSessionUI(){
   document.getElementById('products').style.display        = 'none';
 }
 function showRegisterModal(){
-  if(state.walletBalance<20000) return alert('Không đủ 20 000 SML!');
+  if(state.walletBalance<20000){
+    return alert('Không đủ 20 000 SML!');
+  }
   document.getElementById('registerModal').style.display='flex';
 }
 function closeRegisterModal(){
   document.getElementById('registerModal').style.display='none';
 }
 function confirmRegister(){
-  state.walletBalance-=20000; updateWallet();
+  state.walletBalance -= 20000;
+  updateWallet();
+  addWalletHistory('Phí đăng ký phiên', -20000);
   state.registrations.push({date:selectedDate,time:Date.now()});
   closeRegisterModal();
   updateSessionUI();
   alert(`Đã đăng ký phiên ngày ${selectedDate}`);
 }
 function joinSession(){
-  const reg=state.registrations.find(r=>r.date===selectedDate);
+  const reg = state.registrations.find(r=>r.date===selectedDate);
   if(!reg) return alert('Bạn chưa đăng ký phiên ngày này!');
   document.getElementById('products').style.display='block';
   renderProducts(); renderPendingSales();
@@ -133,9 +147,8 @@ function renderProducts(){
 }
 function buyProduct(id){
   const p=state.products.find(x=>x.id===id);
-  if(!p){
-    alert('Không tìm thấy sản phẩm'); return;
-  }
+  if(!p) return alert('Không tìm thấy sản phẩm');
+  // chỉ thêm vào userNFT, không trừ SML
   state.userNFT.push({ ...p, status:'bought' });
   state.products = state.products.filter(x=>x.id!==id);
   renderProducts(); renderNFTs();
@@ -149,7 +162,7 @@ function renderPendingSales(){
       c.innerHTML+=`
         <div class="sale-item">
           <b>${s.name}</b><br>ID:${s.id}<br>
-          Giá gửi bán: ${fmt(s.salePrice)} SML<br>
+          Giá gửi bán:${fmt(s.salePrice)} SML<br>
           <button class="small" onclick="buyPendingSale('${s.id}')">Mua</button>
         </div>`;
     });
@@ -158,10 +171,11 @@ function buyPendingSale(id){
   const idx=state.pendingSales.findIndex(x=>x.id===id);
   if(idx<0) return;
   const s=state.pendingSales[idx];
-  if(state.walletBalance<s.salePrice){
-    alert('Không đủ SML'); return;
+  if(state.walletBalance < s.salePrice){
+    return alert('Không đủ SML!');
   }
-  state.walletBalance-=s.salePrice; updateWallet();
+  state.walletBalance -= s.salePrice; updateWallet();
+  addWalletHistory(`Mua lại ${s.name}`, -s.salePrice);
   state.userNFT.push({ ...s, status:'bought' });
   state.pendingSales.splice(idx,1);
   renderPendingSales(); renderNFTs();
@@ -171,15 +185,13 @@ function buyPendingSale(id){
 function renderNFTs(){
   const c=document.getElementById('nftList'); c.innerHTML=''; let tot=0;
   if(!state.userNFT.length){
-    c.textContent='Chưa có sản phẩm.'; 
-    document.getElementById('totalSpent').innerText = '0';
-    return;
+    c.textContent='Chưa có sản phẩm.'; return;
   }
   state.userNFT.forEach(it=>{
     tot += it.price;
     let html = `<div class="nft-item"><b>${it.name}</b><br>ID:${it.id}<br>`;
     if(it.status==='bought'){
-      html += `<button class="small" onclick="confirmPayment('${it.id}')">Thanh toán (${fmt(it.price)} SML)</button>`;
+      html += `<button class="small" onclick="confirmPayment('${it.id}')">Thanh toán — ${fmt(it.price)} SML</button>`;
     }
     else if(it.status==='paid'){
       html += `
@@ -191,7 +203,7 @@ function renderNFTs(){
       html += `<p>Đã mở, hoàn ${fmt(it.refund)} SML</p>`;
     }
     else if(it.status==='pendingSale'){
-      html += `<p>Đang gửi bán: ${fmt(it.salePrice)} SML (Phí: ${fmt(it.saleFee)}) ngày ${it.sellDate}</p>`;
+      html += `<p>Đang treo bán: ${fmt(it.salePrice)} SML (Phí:${fmt(it.saleFee)}) ngày ${it.sellDate}</p>`;
     }
     html += `</div>`;
     c.innerHTML += html;
@@ -204,13 +216,14 @@ function confirmPayment(id){
   const it = state.userNFT.find(x=>x.id===id && x.status==='bought');
   if(!it) return;
   if(state.walletBalance < it.price){
-    alert('Không đủ SML để thanh toán!'); return;
+    return alert('Không đủ SML để thanh toán!');
   }
-  // trừ SML, giả lập chuyển cho seller
   state.walletBalance -= it.price; updateWallet();
+  addWalletHistory(`Thanh toán ${it.name}`, -it.price);
   it.status = 'paid';
-  alert(`Đã thanh toán ${fmt(it.price)} SML cho ${it.seller}`);
-  renderNFTs();
+  const time = new Date().toLocaleString('vi-VN');
+  state.nftHistory.unshift({id:it.id,name:it.name,price:it.price,time});
+  renderNFTs(); renderNFTHistory();
 }
 
 // Mở
@@ -219,9 +232,9 @@ function openNFT(id){
   if(!it) return;
   const refund = Math.floor(it.price * 0.9);
   state.walletBalance += refund; updateWallet();
+  addWalletHistory(`Hoàn NFT ${it.name}`, +refund);
   it.status = 'opened';
   it.refund = refund;
-  alert(`Bạn nhận lại ${fmt(refund)} SML (90% giá mua)`);
   renderNFTs();
 }
 
@@ -229,36 +242,29 @@ function openNFT(id){
 function sellNFT(id){
   const it = state.userNFT.find(x=>x.id===id && x.status==='paid');
   if(!it) return;
-  const profit = Math.floor(it.price * 0.015);
-  const fee    = Math.ceil(it.price * 0.034);
-  const salePrice = it.price + profit + fee;
+  const profit = Math.floor(it.price*0.015);
+  const fee    = Math.ceil(it.price*0.034);
+  const salePrice = it.price+profit+fee;
   if(state.walletBalance < fee){
-    alert(`Không đủ SML để trừ phí ${fmt(fee)} SML`); return;
+    return alert(`Không đủ SML để trừ phí ${fmt(fee)} SML`);
   }
-  // hiện pop xác nhận
-  const ok = confirm(
-    `Bán "${it.name}" (ID: ${it.id})\n`+
-    `Giá mua gốc: ${fmt(it.price)} SML\n`+
-    `Lợi nhuận 1.5%: ${fmt(profit)} SML\n`+
-    `Phí 3.4%: ${fmt(fee)} SML\n`+
-    `>> Giá bán: ${fmt(salePrice)} SML\n\n`+
-    `Xác nhận gửi bán?`
-  );
-  if(!ok) return;
-  // trừ phí, đẩy vào pendingSales cho phiên kế tiếp
+  if(!confirm(
+    `Bán "${it.name}"\n`+
+    `Giá gốc: ${fmt(it.price)}\n`+
+    `Lợi nhuận: ${fmt(profit)}\n`+
+    `Phí: ${fmt(fee)}\n`+
+    `>>>> Giá bán: ${fmt(salePrice)}\n`+
+    `Xác nhận?`
+  )) return;
   state.walletBalance -= fee; updateWallet();
+  addWalletHistory(`Phí gửi bán ${it.name}`, -fee);
   it.status = 'pendingSale';
-  it.saleFee = fee;
   it.salePrice = salePrice;
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate()+1);
-  it.sellDate = `${String(tomorrow.getDate()).padStart(2,'0')}/${String(tomorrow.getMonth()+1).padStart(2,'0')}`;
-  state.pendingSales.push({
-    id: it.id, name: it.name,
-    salePrice, saleFee: fee, sellDate: it.sellDate
-  });
+  it.saleFee = fee;
+  const t = new Date(); t.setDate(t.getDate()+1);
+  it.sellDate = `${String(t.getDate()).padStart(2,'0')}/${String(t.getMonth()+1).padStart(2,'0')}`;
+  state.pendingSales.push({id:it.id,name:it.name,salePrice, saleFee:fee, sellDate:it.sellDate});
   renderNFTs(); renderPendingSales();
-  alert('Sản phẩm đã được gửi bán cho phiên ' + it.sellDate);
 }
 
 // ===== WALLET REQUESTS =====
@@ -269,7 +275,7 @@ function showDeposit(){
     <button onclick="requestDeposit()">Gửi yêu cầu</button>`;
 }
 function requestDeposit(){
-  const amt=parseFloat(document.getElementById('depositAmt').value);
+  const amt = parseFloat(document.getElementById('depositAmt').value);
   if(isNaN(amt)||amt<=0) return alert('Nhập số hợp lệ');
   state.depositRequests.push({
     id:Date.now()+'', userId:currentUsername,
@@ -279,6 +285,7 @@ function requestDeposit(){
   renderRequestHistory();
   document.getElementById('walletAction').innerHTML='';
 }
+
 function showWithdraw(){
   document.getElementById('walletAction').innerHTML=`
     <h3>Rút SML</h3>
@@ -286,7 +293,7 @@ function showWithdraw(){
     <button onclick="requestWithdraw()">Gửi yêu cầu</button>`;
 }
 function requestWithdraw(){
-  const amt=parseFloat(document.getElementById('withdrawAmt').value);
+  const amt = parseFloat(document.getElementById('withdrawAmt').value);
   if(isNaN(amt)||amt<=0) return alert('Nhập số hợp lệ');
   const fee=Math.ceil(amt*0.015);
   if(amt+fee>state.walletBalance) return alert('Không đủ SML');
@@ -298,12 +305,38 @@ function requestWithdraw(){
   renderRequestHistory();
   document.getElementById('walletAction').innerHTML='';
 }
+
 function renderRequestHistory(){
-  const all=state.depositRequests.concat(state.withdrawRequests)
+  const all = state.depositRequests.concat(state.withdrawRequests)
     .sort((a,b)=>new Date(b.time)-new Date(a.time));
-  document.getElementById('requestHistory').innerHTML=all.map(r=>`
+  document.getElementById('requestHistory').innerHTML = all.map(r=>`
     <tr><td>${r.type}</td><td>${r.amount}</td><td>${r.time}</td><td>${r.status}</td></tr>
   `).join('');
+}
+
+function renderWalletHistory(){
+  const c = document.getElementById('walletHistory');
+  if(!state.walletHistory.length){
+    c.textContent='Chưa có giao dịch.'; return;
+  }
+  c.innerHTML = state.walletHistory.map(h=>{
+    const cls = h.delta<0?'neg':'pos';
+    return `<div><span>${h.time}:</span>
+      <span class="${cls}">${h.delta>0?'+':''}${fmt(h.delta)} SML</span>
+      – ${h.desc}
+    </div>`;
+  }).join('');
+}
+
+// ===== NFT HISTORY =====
+function renderNFTHistory(){
+  const ul = document.getElementById('nftHistory');
+  if(!state.nftHistory.length){
+    ul.textContent='Chưa có lịch sử mua.'; return;
+  }
+  ul.innerHTML = state.nftHistory.map(x=>
+    `<li>${x.time}: ${x.name} (ID:${x.id}) — ${fmt(x.price)} SML</li>`
+  ).join('');
 }
 
 // ===== PROFILE =====
