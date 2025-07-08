@@ -15,7 +15,7 @@
     <button id="loginBtn">Tiếp tục</button>
   </section>
 
-  <!-- APP CHÍNH -->
+  <!-- APP -->
   <div id="app" style="display:none">
 
     <!-- NAV -->
@@ -47,7 +47,7 @@
       <div id="products" style="display:none">
         <h3>Sản phẩm phiên hôm nay</h3>
         <div id="productList" class="grid"></div>
-        <h3>Sản phẩm treo bán cho phiên này</h3>
+        <h3>Sản phẩm treo bán</h3>
         <div id="pendingSaleList" class="grid"></div>
       </div>
     </section>
@@ -71,11 +71,6 @@
         <button onclick="showWithdraw()">Rút</button>
       </div>
       <div id="walletAction"></div>
-      <h3>Lịch sử yêu cầu</h3>
-      <table>
-        <thead><tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
-        <tbody id="requestHistory"></tbody>
-      </table>
       <h3>Lịch sử giao dịch</h3>
       <div id="walletHistory">Chưa có giao dịch.</div>
     </section>
@@ -113,8 +108,18 @@
         <p>Giá USDT hiện tại: <span id="usdtPrice">26 400</span> VND</p>
         <input type="number" id="depositSML" placeholder="Số SML muốn nạp" />
         <p id="requiredUSDT">Cần chuyển: 0 USDT</p>
-        <button onclick="submitDeposit()">Gửi yêu cầu</button>
+        <button onclick="submitDeposit()">Xác nhận nạp</button>
         <button onclick="closeDepositModal()">Hủy</button>
+      </div>
+    </div>
+
+    <!-- MODAL RÚT -->
+    <div class="modal" id="withdrawModal">
+      <div class="modal-content">
+        <h3>Rút SML (min 1 000 000)</h3>
+        <input type="number" id="withdrawAmt" placeholder="Số SML rút" />
+        <button onclick="submitWithdraw()">Xác nhận rút</button>
+        <button onclick="closeWithdrawModal()">Hủy</button>
       </div>
     </div>
 
