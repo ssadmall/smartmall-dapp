@@ -1,77 +1,34 @@
 body {
   background: #0a1a2f;
   color: #fff;
-  font-family: Arial;
-  margin: 0;
-  padding-bottom: 100px;
+  font-family: Arial, sans-serif;
+  margin: 0; padding-bottom: 100px;
 }
-#langSwitcher {
-  padding: 10px;
-  text-align: right;
-}
-section {
-  display: none;
-  padding: 20px;
-  margin: 10px;
-  background: #162447;
-  border: 2px solid #21e6c1;
-  border-radius: 8px;
-}
-section.active {
-  display: block;
-}
-h2 {
-  margin-top: 0;
-  color: #21e6c1;
-}
+section { display: none; padding: 20px; margin: 10px; background: #162447; border: 2px solid #21e6c1; border-radius: 8px; }
+section.show { display: block; }
+h2 { color: #21e6c1; margin-top: 0; }
+button, input { border: none; border-radius: 4px; }
 button {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
   background: #21e6c1;
   color: #0a1a2f;
-  border: none;
-  border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
+  margin: 6px 0;
+  padding: 8px;
+  width: 100%;
 }
 button.small {
   display: inline-block;
   width: auto;
-  margin: 4px;
+  margin: 4px 2px;
   padding: 6px 12px;
-  font-size: 14px;
 }
 input {
   width: 100%;
   padding: 8px;
   margin: 6px 0;
-  border: none;
-  border-radius: 4px;
   background: #1f4068;
   color: #fff;
-}
-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: #162447;
-  border-top: 2px solid #21e6c1;
-}
-nav button {
-  flex: 1;
-  background: #162447;
-  color: #fff;
-  padding: 12px;
-  border: none;
-  font-weight: bold;
-}
-nav button.active {
-  background: #21e6c1;
-  color: #162447;
 }
 .date-tab-bar {
   display: flex;
@@ -87,19 +44,15 @@ nav button.active {
   padding: 6px 4px;
   background: #0f1c2e;
   color: #ccc;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
 }
 .date-tab-bar button.active {
   background: #21e6c1;
-  color: #0a1a2f;
+  color: #162447;
   font-weight: bold;
 }
-.product,
-.nft-item,
-.sale-item {
+.product, .nft-item, .sale-item {
   background: #1f4068;
   border: 1px solid #21e6c1;
   border-radius: 6px;
@@ -121,17 +74,51 @@ nav button.active {
   border-radius: 8px;
   width: 300px;
 }
-#walletAction {
-  margin-top: 10px;
-}
+#walletAction { margin-top: 10px; }
 #walletHistory {
   margin-top: 20px;
   max-height: 200px;
   overflow-y: auto;
 }
-#walletHistory div {
-  padding: 6px 0;
-  font-size: 14px;
-}
+#walletHistory div { padding: 6px 0; font-size: 14px; }
 .pos { color: #4caf50; }
 .neg { color: #f44336; }
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #162447;
+  border-top: 2px solid #21e6c1;
+}
+nav .nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #fff;
+  background: #162447;
+  cursor: pointer;
+}
+nav .nav-btn.active,
+nav .nav-btn:hover {
+  background: #21e6c1;
+  color: #162447;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th, td {
+  border: 1px solid #21e6c1;
+  padding: 6px;
+  text-align: left;
+  font-size: 14px;
+}
+th { background: #1b2c45; }
+#referralSection a { word-break: break-all; color: #ffcc00; }
