@@ -1,88 +1,24 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Smart Mall DApp</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="config.js"></script>
-  <script defer src="script.js"></script>
-</head>
-<body>
-
-  <!-- LOGIN -->
-  <section id="login" class="show">
-    <h2>🔑 Đăng nhập</h2>
-    <input id="usernameInput" placeholder="Nhập username (viết liền)" />
-    <button id="loginBtn">Tiếp tục</button>
-  </section>
-
-  <!-- APP CHÍNH (ẩn khi chưa login) -->
-  <div id="app" style="display:none">
-
-    <!-- NAVIGATION -->
-    <nav>
-      <button id="btn-home"    class="nav-btn" onclick="showSection('home')">🏠 Trang chủ</button>
-      <button id="btn-session" class="nav-btn" onclick="showSection('session')">⏱️ Phiên</button>
-      <button id="btn-wallet"  class="nav-btn" onclick="showSection('wallet')">💰 Ví</button>
-      <button id="btn-profile" class="nav-btn" onclick="showSection('profile')">👤 Thông tin</button>
-    </nav>
-
-    <!-- HOME -->
-    <section id="home">
-      <h2>📢 Thông báo từ Admin</h2>
-      <p id="adminNotice">Chào mừng bạn đến với Smart Mall – Giao dịch thông minh, cộng đồng bền vững!</p>
-    </section>
-
     <!-- SESSION -->
     <section id="session">
       <h2>🕒 Phiên giao dịch</h2>
       <div class="date-tab-bar" id="sessionDateTabs"></div>
       <p>Ngày phiên đã chọn: <b id="selectedDateText"></b></p>
+
+      <!-- Đăng ký -->
       <div id="registrationBox">
-        <button onclick="showRegisterModal()">Đăng ký phiên</button>
+        <button id="registerBtn" onclick="showRegisterModal()">Đăng ký phiên (20 000 SML)</button>
       </div>
-      <div id="joinContainer">
+      <!-- Tham gia (chỉ hiện khi đã đăng ký ngày đó) -->
+      <div id="joinContainer" style="display:none">
         <button class="small" onclick="joinSession()">Tham gia phiên</button>
       </div>
-      <div id="products">
+
+      <!-- Sản phẩm -->
+      <div id="products" style="display:none">
         <h3>Sản phẩm phiên hôm nay</h3>
         <div id="productList"></div>
-        <h3>Sản phẩm treo bán</h3>
+        <h3>Sản phẩm treo bán cho phiên này</h3>
         <div id="pendingSaleList"></div>
-      </div>
-    </section>
-
-    <!-- WALLET -->
-    <section id="wallet">
-      <h2>💰 Ví SML</h2>
-      <p>Số dư: <span id="walletBalance">100000</span> SML</p>
-      <button onclick="showDeposit()">Nạp</button>
-      <button onclick="showWithdraw()">Rút</button>
-      <div id="walletAction"></div>
-      <h3>Lịch sử yêu cầu</h3>
-      <table>
-        <thead>
-          <tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr>
-        </thead>
-        <tbody id="requestHistory"></tbody>
-      </table>
-    </section>
-
-    <!-- PROFILE -->
-    <section id="profile">
-      <h2>👤 Thông tin cá nhân</h2>
-      <input id="username" placeholder="Tên (viết liền)"/>
-      <input id="phone"    placeholder="Số điện thoại"/>
-      <input id="fullname" placeholder="Họ tên đầy đủ"/>
-      <input id="bep20"    placeholder="Địa chỉ ví BEP20"/>
-      <button onclick="saveProfile()">Lưu thông tin</button>
-      <div id="referralSection">
-        <h3>🔗 Link giới thiệu</h3>
-        <p><a href="#" id="referralLink" target="_blank"></a></p>
-        <p>👥 Giới thiệu trực tiếp: <span id="directRefCount">0</span></p>
-        <p>🌐 Đội nhóm: <span id="teamRefCount">0</span></p>
       </div>
     </section>
 
@@ -90,13 +26,7 @@
     <div class="modal" id="registerModal">
       <div class="modal-content">
         <h3>Phí đăng ký: 20 000 SML</h3>
-        <input type="number" id="registerAmount" placeholder="Số tiền dự kiến mua"/>
-        <button onclick="confirmRegister()">Xác nhận</button>
+        <button onclick="confirmRegister()">Xác nhận trừ 20 000 SML</button>
         <button onclick="closeRegisterModal()">Hủy</button>
       </div>
     </div>
-
-  </div>
-
-</body>
-</html>
