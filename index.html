@@ -5,47 +5,139 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Smart Mall DApp</title>
   <link rel="stylesheet" href="style.css"/>
+  <!-- Telegram Web App -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Config: rename config.js.example → config.js và điền GITHUB_TOKEN -->
   <script src="config.js"></script>
+  <!-- Main JS -->
   <script defer src="script.js"></script>
 </head>
 <body>
-  <!-- ... các section home/session/nft như trước ... -->
 
-  <!-- WALLET -->
-  <section id="wallet">
-    <h2>💰 Ví SML</h2>
-    <p>Số dư: <span id="walletBalance">100000</span> SML</p>
-    <button onclick="showDeposit()">Nạp</button>
-    <button onclick="showWithdraw()">Rút</button>
-    <div id="walletAction"></div>
-    <h3>Lịch sử yêu cầu</h3>
-    <table>
-      <thead><tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
-      <tbody id="requestHistory"></tbody>
-    </table>
+  <!-- LOGIN -->
+  <section id="login" class="show">
+    <h2>🔑 Đăng nhập</h2>
+    <input id="loginUsername" placeholder="Nhập tên đăng nhập"/>
+    <button onclick="handleLogin()">Đăng nhập</button>
   </section>
 
-  <!-- PROFILE & REFERRAL ... -->
+  <!-- APP (ẩn lúc đầu) -->
+  <div id="app" style="display:none">
 
-  <!-- ADMIN PANEL -->
-  <section id="admin">
-    <h2>👑 Admin Panel</h2>
-    <!-- ... bảng members, usageLogs ... -->
+    <!-- NAV -->
+    <nav>
+      <button id="btn-home"    class="nav-btn" onclick="showSection('home')">🏠 Trang chủ</button>
+      <button id="btn-session" class="nav-btn" onclick="showSection('session')">⏱️ Phiên</button>
+      <button id="btn-nft"     class="nav-btn" onclick="showSection('nft')">🧾 NFT</button>
+      <button id="btn-wallet"  class="nav-btn" onclick="showSection('wallet')">💰 Ví</button>
+      <button id="btn-profile" class="nav-btn" onclick="showSection('profile')">👤 Thông tin</button>
+      <button id="btn-admin"   class="nav-btn" onclick="showSection('admin')">🛠️ Admin</button>
+    </nav>
 
-    <h3>Yêu cầu Nạp SML</h3>
-    <table>
-      <thead><tr><th>UserID</th><th>Số lượng</th><th>Thời gian</th><th>Action</th></tr></thead>
-      <tbody id="depositRequestsList"></tbody>
-    </table>
+    <!-- HOME -->
+    <section id="home">
+      <h2>📢 Thông báo từ Admin</h2>
+      <p>Chào mừng bạn đến với Smart Mall – Giao dịch thông minh, cộng đồng bền vững!</p>
+    </section>
 
-    <h3>Yêu cầu Rút SML</h3>
-    <table>
-      <thead><tr><th>UserID</th><th>Số lượng</th><th>Thời gian</th><th>Action</th></tr></thead>
-      <tbody id="withdrawRequestsList"></tbody>
-    </table>
-  </section>
+    <!-- SESSION -->
+    <section id="session">
+      <h2>🕒 Phiên giao dịch</h2>
+      <div class="date-tab-bar" id="sessionDateTabs"></div>
+      <p>Ngày phiên đã chọn: <b id="selectedDateText"></b></p>
+      <div id="registrationBox">
+        <button onclick="showRegisterModal()">Đăng ký phiên</button>
+      </div>
+      <div id="joinContainer">
+        <button class="small" onclick="joinSession()">Tham gia phiên</button>
+      </div>
+      <div id="products">
+        <h3>Sản phẩm phiên hôm nay</h3>
+        <div id="productList"></div>
+        <h3>Sản phẩm treo bán</h3>
+        <div id="pendingSaleList"></div>
+      </div>
+    </section>
 
-  <!-- NAVIGATION ... -->
+    <!-- NFT -->
+    <section id="nft">
+      <h2>🧾 NFT của tôi</h2>
+      <div id="nftList"></div>
+      <p>Tổng chi tiêu: <span id="totalSpent">0</span> USDT</p>
+    </section>
+
+    <!-- WALLET -->
+    <section id="wallet">
+      <h2>💰 Ví SML</h2>
+      <p>Số dư: <span id="walletBalance">100000</span> SML</p>
+      <button onclick="showDeposit()">Nạp</button>
+      <button onclick="showWithdraw()">Rút</button>
+      <div id="walletAction"></div>
+      <h3>Lịch sử yêu cầu</h3>
+      <table>
+        <thead><tr><th>Loại</th><th>Số Lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
+        <tbody id="requestHistory"></tbody>
+      </table>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile">
+      <h2>👤 Thông tin cá nhân</h2>
+      <input id="username" placeholder="Tên (viết liền)"/>
+      <input id="phone"    placeholder="Số điện thoại"/>
+      <input id="fullname" placeholder="Họ tên đầy đủ"/>
+      <input id="bep20"    placeholder="Địa chỉ ví BEP20"/>
+      <button onclick="saveProfile()">Lưu thông tin</button>
+      <div id="referralSection">
+        <h3>🔗 Link giới thiệu</h3>
+        <p><a href="#" id="referralLink" target="_blank"></a></p>
+        <p>👥 Giới thiệu trực tiếp: <span id="directRefCount">0</span></p>
+        <p>🌐 Đội nhóm: <span id="teamRefCount">0</span></p>
+      </div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <section id="admin">
+      <h2>👑 Admin Panel</h2>
+
+      <h3>Danh sách thành viên</h3>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Username</th><th>SML</th><th>Ngày đăng ký</th>
+              <th>Đã mua</th><th>Direct</th><th>Team</th></tr>
+        </thead>
+        <tbody id="adminMemberList"></tbody>
+      </table>
+
+      <h3>Lịch sử hành động</h3>
+      <table>
+        <thead><tr><th>ID</th><th>User</th><th>Action</th><th>Time</th></tr></thead>
+        <tbody id="adminUsageLogs"></tbody>
+      </table>
+
+      <h3>Yêu cầu Nạp SML</h3>
+      <table>
+        <thead><tr><th>UserID</th><th>Số lượng</th><th>Thời gian</th><th>Action</th></tr></thead>
+        <tbody id="depositRequestsList"></tbody>
+      </table>
+
+      <h3>Yêu cầu Rút SML</h3>
+      <table>
+        <thead><tr><th>UserID</th><th>Số lượng</th><th>Thời gian</th><th>Action</th></tr></thead>
+        <tbody id="withdrawRequestsList"></tbody>
+      </table>
+    </section>
+
+    <!-- MODAL ĐĂNG KÝ -->
+    <div class="modal" id="registerModal">
+      <div class="modal-content">
+        <h3>Phí đăng ký: 20 000 SML</h3>
+        <input type="number" id="registerAmount" placeholder="Số tiền dự kiến mua"/>
+        <button onclick="confirmRegister()">Xác nhận</button>
+        <button onclick="closeRegisterModal()">Hủy</button>
+      </div>
+    </div>
+
+  </div>
 </body>
 </html>
