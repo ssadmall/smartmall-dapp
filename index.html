@@ -139,14 +139,12 @@
   </nav>
 
   <script>
-    // Telegram WebApp init (chỉ hoạt động trên HTTPS từ Telegram)
-    let tg, userId;
-    try {
-      tg = window.Telegram.WebApp;
+    // Lấy referral link, mặc định guest nếu không trong Telegram WebApp
+    let userId = 'guest';
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
       tg.ready();
-      userId = tg.initDataUnsafe.user.id;
-    } catch(e) {
-      userId = 'guest';
+      userId = tg.initDataUnsafe?.user?.id ?? 'guest';
     }
     const referralLink = `https://t.me/SmartMallonebot?start=${userId}`;
 
@@ -160,7 +158,7 @@
     ];
     let userNFT=[], pendingSales=[], walletHistory=[];
 
-    // Helpers
+    // Utils
     function fmt(n){ return n.toLocaleString('vi-VN'); }
     function updateWallet(){ document.getElementById('walletBalance').innerText = fmt(walletBalance); }
     function addHistory(desc,delta){
@@ -186,7 +184,7 @@
       document.getElementById('btn-'+id).classList.add('active');
     }
 
-    // Session date tabs
+    // Session tabs
     function generateTabs(){
       const c=document.getElementById('sessionDateTabs'),
             txt=document.getElementById('selectedDateText'),
@@ -232,7 +230,7 @@
       renderProducts(); renderPendingSales();
     }
 
-    // Render products
+    // Products
     function renderProducts(){
       const list=document.getElementById('productList'); list.innerHTML='';
       products.forEach(p=>{
@@ -244,7 +242,7 @@
       });
     }
     function buyProduct(id){
-      const p=products.find(x=>x.id===id); if(!p) return;
+      const p=products.find(x=>x.id===id); if(!p)return;
       userNFT.push({...p,status:'bought'}); products=products.filter(x=>x.id!==id);
       renderProducts(); renderNFTs();
     }
@@ -289,7 +287,7 @@
       document.getElementById('totalSpent').innerText=fmt(tot);
     }
     function markPaid(id){
-      const it=userNFT.find(x=>x.id===id); if(!it||walletBalance<it.price) return alert('Không đủ SML!');
+      const it=userNFT.find(x=>x.id===id); if(!it||walletBalance<it.price)return alert('Không đủ SML!');
       walletBalance-=it.price; updateWallet(); addHistory('Thanh toán',-it.price);
       it.status='owned'; renderNFTs();
     }
@@ -304,54 +302,49 @@
       if(walletBalance<fee) return alert('Không đủ SML trả phí!');
       walletBalance-=fee; updateWallet(); addHistory('Phí gửi bán',-fee);
       it.status='pendingSale'; it.salePrice=salePrice;
-      it.sellDate=new Intl.DateTimeFormat('vi-VN',{ day:'2-digit', month:'2-digit' })
-                     .format(new Date(Date.now()+86400000));
+      const tm=new Date(); tm.setDate(tm.getDate()+1);
+      it.sellDate=new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit'}).format(tm);
       pendingSales.push({...it}); renderNFTs(); renderPendingSales();
     }
 
     // Wallet
     function showDeposit(){ document.getElementById('walletAction').innerHTML=`
-      <h3>Nạp SML</h3>
-      <input type="number" id="depositAmt" placeholder="Số SML"/>
+      <h3>Nạp SML</h3><input type="number" id="depositAmt" placeholder="Số SML"/>
       <button onclick="confirmDeposit()">Xác nhận</button>`; }
     function confirmDeposit(){
       const amt=parseFloat(document.getElementById('depositAmt').value);
-      if(isNaN(amt)||amt<=0) return alert('Nhập số hợp lệ!');
+      if(isNaN(amt)||amt<=0)return alert('Nhập số hợp lệ!');
       walletBalance+=amt; updateWallet(); addHistory('Nạp SML',amt);
       document.getElementById('walletAction').innerHTML='';
     }
     function showTransfer(){ document.getElementById('walletAction').innerHTML=`
-      <h3>Chuyển SML</h3>
-      <input id="transferTo" placeholder="Người nhận"/>
-      <input id="transferAmt" placeholder="Số SML"/>
-      <button onclick="confirmTransfer()">Xác nhận</button>`; }
+      <h3>Chuyển SML</h3><input id="transferTo" placeholder="Người nhận"/>
+      <input id="transferAmt" placeholder="Số SML"/><button onclick="confirmTransfer()">Xác nhận</button>`; }
     function confirmTransfer(){
       const to=document.getElementById('transferTo').value.trim(),
             amt=parseFloat(document.getElementById('transferAmt').value);
-      if(!to||isNaN(amt)||amt<=0) return alert('Nhập đúng thông tin!');
-      if(walletBalance<amt) return alert('Không đủ SML!');
+      if(!to||isNaN(amt)||amt<=0)return alert('Nhập đúng thông tin!');
+      if(walletBalance<amt)return alert('Không đủ SML!');
       walletBalance-=amt; updateWallet(); addHistory(`Chuyển cho ${to}`,-amt);
       document.getElementById('walletAction').innerHTML='';
     }
     function showWithdraw(){ document.getElementById('walletAction').innerHTML=`
-      <h3>Rút SML</h3>
-      <input id="withdrawAddr" placeholder="Địa chỉ BEP20"/>
-      <input id="withdrawAmt" placeholder="Số SML"/>
-      <p>Phí 1.5%</p>
+      <h3>Rút SML</h3><input id="withdrawAddr" placeholder="Địa chỉ BEP20"/>
+      <input id="withdrawAmt" placeholder="Số SML"/><p>Phí 1.5%</p>
       <button onclick="confirmWithdraw()">Xác nhận</button>`; }
     function confirmWithdraw(){
       const addr=document.getElementById('withdrawAddr').value.trim(),
             amt=parseFloat(document.getElementById('withdrawAmt').value);
-      if(!addr||isNaN(amt)||amt<=0) return alert('Nhập đúng thông tin!');
+      if(!addr||isNaN(amt)||amt<=0)return alert('Nhập đúng thông tin!');
       const fee=amt*0.015, total=amt+fee;
-      if(walletBalance<total) return alert('Không đủ SML!');
+      if(walletBalance<total)return alert('Không đủ SML!');
       walletBalance-=total; updateWallet(); addHistory(`Rút ${fmt(amt)} (+ phí ${fmt(fee)})`,-total);
       document.getElementById('walletAction').innerHTML='';
     }
 
     function saveProfile(){ alert('Thông tin cá nhân đã lưu.'); }
 
-    // Init on load
+    // INIT
     window.onload = () => {
       generateTabs();
       updateWallet();
