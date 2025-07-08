@@ -1,123 +1,123 @@
-// Mảng lưu registrations theo ngày
-// Mỗi phần tử: { date: 'dd/MM', time: timestamp }
-state.registrations = state.registrations || [];
-
-/** Cập nhật giao diện SESSION sau mỗi thay đổi */
-function updateSessionUI() {
-  const date = selectedDate;
-  // kiểm xem đã đăng ký ngày này chưa
-  const reg = state.registrations.find(r => r.date === date);
-  document.getElementById('registrationBox').style.display = reg ? 'none' : 'block';
-  document.getElementById('joinContainer').style.display     = reg ? 'block' : 'none';
-  // ẩn products nếu chưa join
-  document.getElementById('products').style.display = 'none';
+body {
+  background: #0a1a2f;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding-bottom: 80px;
 }
-
-/** Gọi khi người dùng bấm Đăng ký phiên */
-function showRegisterModal() {
-  if (state.walletBalance < 20000) {
-    return alert('Không đủ 20 000 SML để đăng ký phiên!');
-  }
-  document.getElementById('registerModal').style.display = 'flex';
+section {
+  display: none;
+  padding: 20px;
+  margin: 10px;
+  background: #162447;
+  border: 2px solid #21e6c1;
+  border-radius: 8px;
 }
-
-function closeRegisterModal() {
-  document.getElementById('registerModal').style.display = 'none';
+section.show { display: block; }
+h2 { color: #21e6c1; margin-top: 0; }
+button, input { border: none; border-radius: 4px; }
+button {
+  background: #21e6c1;
+  color: #0a1a2f;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 6px 0;
+  padding: 8px;
+  width: 100%;
 }
-
-/** Xác nhận đăng ký: trừ SML, lưu đăng ký cho ngày đó */
-function confirmRegister() {
-  // trừ SML
-  state.walletBalance -= 20000;
-  updateWallet();
-
-  // thêm registration cho ngày đang chọn
-  state.registrations.push({ date: selectedDate, time: Date.now() });
-  saveToLocal();  // lưu local ngay
-  // (nếu dùng GitHub API, gọi saveUserData ở đây)
-
-  // cập nhật UI
-  closeRegisterModal();
-  updateSessionUI();
-  alert(`Đã đăng ký phiên ngày ${selectedDate}!`);
+button.small {
+  display: inline-block;
+  width: auto;
+  margin: 4px 2px;
+  padding: 6px 12px;
 }
-
-/** Khi bấm Tham gia phiên */
-function joinSession() {
-  // chỉ hiển thị sản phẩm nếu đã đăng ký ngày đó
-  const reg = state.registrations.find(r => r.date === selectedDate);
-  if (!reg) {
-    return alert('Bạn chưa đăng ký phiên ngày này.');
-  }
-  // show products
-  document.getElementById('products').style.display = 'block';
-  renderProducts();         // sản phẩm phiên admin đăng bán
-  renderPendingSales();     // sản phẩm treo bán cho phiên này
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+  background: #1f4068;
+  color: #fff;
 }
-
-/** Vẽ các sản phẩm admin bán trong phiên */
-function renderProducts() {
-  const c = document.getElementById('productList');
-  c.innerHTML = '';
-  // state.products chứa các sản phẩm gốc của admin
-  state.products.forEach(p => {
-    c.innerHTML += `
-      <div class="product">
-        <b>${p.name}</b><br>
-        ID: ${p.id}<br>
-        Giá: ${fmt(p.price)} SML<br>
-        <button class="small" onclick="buyProduct('${p.id}')">Mua</button>
-      </div>`;
-  });
+.date-tab-bar {
+  display: flex;
+  justify-content: space-between;
+  background: #1b2c45;
+  padding: 6px;
+  border-radius: 8px;
+  margin: 12px 0;
 }
-
-/** Vẽ các sản phẩm treo bán cho đúng phiên (ngày) đang chọn */
-function renderPendingSales() {
-  const c = document.getElementById('pendingSaleList');
-  c.innerHTML = '';
-  const today = selectedDate;
-  state.pendingSales
-    .filter(s => s.sellDate === today)
-    .forEach(s => {
-      c.innerHTML += `
-        <div class="sale-item">
-          <b>${s.name}</b><br>
-          ID: ${s.id}<br>
-          Giá gửi bán: ${fmt(s.salePrice)} SML<br>
-          Ngày gửi: ${s.sellDate}<br>
-          Phiên bán: ${s.sellDate}<br>
-          <button class="small" onclick="buyPendingSale('${s.id}')">Mua</button>
-        </div>`;
-    });
+.date-tab-bar button {
+  flex: 1;
+  margin: 0 2px;
+  padding: 6px 4px;
+  background: #0f1c2e;
+  color: #ccc;
+  font-size: 13px;
+  cursor: pointer;
 }
-
-// Khi khởi tạo tabs hoặc chọn ngày:
-function generateTabs() {
-  const c = document.getElementById('sessionDateTabs'),
-        txt = document.getElementById('selectedDateText'),
-        today = new Date();
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(d.getDate() + i);
-    const lbl = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
-    const btn = document.createElement('button');
-    btn.textContent = lbl;
-    btn.onclick = () => {
-      // chuyển active tab
-      c.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-      btn.classList.add('active');
-      selectedDate = lbl;
-      txt.textContent = lbl;
-      updateSessionUI();
-    };
-    if (i === 0) {
-      btn.classList.add('active');
-      selectedDate = lbl;
-      txt.textContent = lbl;
-    }
-    c.appendChild(btn);
-  }
-  updateSessionUI();
+.date-tab-bar button.active {
+  background: #21e6c1;
+  color: #162447;
+  font-weight: bold;
 }
-
-// Cuối cùng, gọi generateTabs() trong initApp()
+.product, .sale-item {
+  background: #1f4068;
+  border: 1px solid #21e6c1;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #fff;
+  color: #000;
+  padding: 20px;
+  border-radius: 8px;
+  width: 280px;
+}
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #162447;
+  border-top: 2px solid #21e6c1;
+}
+nav .nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #fff;
+  background: #162447;
+  cursor: pointer;
+}
+nav .nav-btn.active,
+nav .nav-btn:hover {
+  background: #21e6c1;
+  color: #162447;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th, td {
+  border: 1px solid #21e6c1;
+  padding: 6px;
+  text-align: left;
+  font-size: 14px;
+}
+th { background: #1b2c45; }
+#referralSection a { word-break: break-all; color: #ffcc00; }
