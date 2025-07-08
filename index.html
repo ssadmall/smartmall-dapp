@@ -64,27 +64,21 @@
     <!-- WALLET -->
     <section id="wallet">
       <h2>💰 Ví SML</h2>
-      <p>Số dư: <span id="walletBalance">100000</span> SML</p>
+      <p>Số dư: <span id="walletBalance">100 000</span> SML</p>
       <div class="wallet-tabs">
         <button onclick="showDeposit()">Nạp</button>
         <button onclick="showTransfer()">Chuyển</button>
         <button onclick="showWithdraw()">Rút</button>
       </div>
       <div id="walletAction"></div>
+
       <h3>Lịch sử giao dịch</h3>
       <div id="walletHistory">Chưa có giao dịch.</div>
 
       <h3>Lịch sử yêu cầu nạp/rút</h3>
       <table>
         <thead>
-          <tr>
-            <th>Loại</th>
-            <th>SML</th>
-            <th>USDT cần</th>
-            <th>Địa chỉ</th>
-            <th>Thời gian</th>
-            <th>Trạng thái</th>
-          </tr>
+          <tr><th>Loại</th><th>SML</th><th>USDT cần</th><th>Địa chỉ</th><th>Thời gian</th><th>Trạng thái</th></tr>
         </thead>
         <tbody id="requestHistory"></tbody>
       </table>
