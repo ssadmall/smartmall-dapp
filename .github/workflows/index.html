@@ -1,425 +1,131 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Mall DApp</title>
   <style>
-    body { background:#0a1a2f;color:#fff;font-family:Arial; margin:0;padding-bottom:100px; }
-    #langSwitcher{padding:10px;text-align:right;}
-    section{display:none;padding:20px;margin:10px;background:#162447;border:2px solid #21e6c1;border-radius:8px;}
-    section.active{display:block;}
-    h2{margin-top:0;color:#21e6c1;}
-    button{display:block;width:100%;padding:10px;margin:8px 0;background:#21e6c1;color:#0a1a2f;border:none;border-radius:5px;font-weight:bold;cursor:pointer;}
-    button.small{display:inline-block;width:auto;margin:4px;padding:6px 12px;font-size:14px;}
-    input{width:100%;padding:8px;margin:6px 0;border:none;border-radius:4px;background:#1f4068;color:#fff;}
-    nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#162447;border-top:2px solid #21e6c1;}
-    nav button{flex:1;background:#162447;color:#fff;padding:12px;border:none;font-weight:bold;}
-    nav button.active{background:#21e6c1;color:#162447;}
-    .date-tab-bar{display:flex;justify-content:space-between;background:#1b2c45;padding:6px;border-radius:8px;margin:12px 0;}
-    .date-tab-bar button{flex:1;margin:0 2px;padding:6px 4px;background:#0f1c2e;color:#ccc;border:none;border-radius:6px;font-size:14px;cursor:pointer;}
-    .date-tab-bar button.active{background:#21e6c1;color:#0a1a2f;font-weight:bold;}
-    .product,.nft-item,.sale-item{background:#1f4068;border:1px solid #21e6c1;border-radius:6px;padding:10px;margin-bottom:10px;}
-    .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
-    .modal-content{background:#fff;color:#000;padding:20px;border-radius:8px;width:300px;}
-    #walletAction{margin-top:10px;}
-    #walletHistory{margin-top:20px;max-height:200px;overflow-y:auto;}
-    #walletHistory div{padding:6px 0;font-size:14px;}
-    .pos{color:#4caf50;}  /* xanh */
-    .neg{color:#f44336;}  /* đỏ */
+    body { background: #0a1a2f; color: #fff; font-family: Arial, sans-serif; padding: 20px; margin: 0; margin-bottom: 80px; }
+    section { display: none; background: #162447; padding: 20px; margin-bottom: 20px; border-radius: 10px; border: 2px solid #21e6c1; }
+    section.active { display: block; }
+    h2 { color: #21e6c1; margin-bottom: 10px; }
+    input, button, textarea { padding: 8px; width: 100%; margin-top: 10px; border-radius: 4px; border: none; }
+    input, textarea { background: #1f4068; color: #fff; }
+    button { background: #21e6c1; color: #0a1a2f; font-weight: bold; cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 999; }
+    .modal-content { background: #fff; color: #000; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; }
+    nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #162447; border-top: 2px solid #21e6c1; z-index: 1000; }
+    nav button { flex: 1; padding: 12px 0; background: #162447; border: none; color: #fff; font-weight: bold; cursor: pointer; }
+    nav button.active { background: #21e6c1; color: #162447; }
+    .date-tab-bar { display: flex; overflow-x: auto; border-bottom: 1px solid #21e6c1; padding-bottom: 4px; margin-bottom: 12px; background: #1b2c45; }
+    .date-tab-bar button { flex: 1; min-width: 60px; background: transparent; border: none; padding: 8px 6px; color: #ccc; font-weight: normal; font-size: 14px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+    .date-tab-bar button.active { color: #ffcc00; font-weight: bold; border-bottom: 2px solid #ffcc00; }
+    .nft-item { border: 1px solid #21e6c1; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
-  <!-- 1. Language Switcher -->
-  <div id="langSwitcher">
-    <select id="langSelect">
-      <option value="vi">Tiếng Việt</option>
-      <option value="en">English</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-      <option value="de">Deutsch</option>
-      <option value="zh">中文</option>
-      <option value="ja">日本語</option>
-      <option value="ko">한국어</option>
-      <option value="ru">Русский</option>
-      <option value="pt">Português</option>
-      <option value="ar">العربية</option>
-      <option value="it">Italiano</option>
-      <option value="nl">Nederlands</option>
-      <option value="tr">Türkçe</option>
-      <option value="sv">Svenska</option>
-      <option value="id">Bahasa Indonesia</option>
-      <option value="th">ภาษาไทย</option>
-      <option value="ms">Bahasa Melayu</option>
-    </select>
+
+<nav>
+  <button onclick="showSection('home')" id="btn-home" class="active">🏠 Trang chủ</button>
+  <button onclick="showSection('session')" id="btn-session">🕒 Phiên</button>
+  <button onclick="showSection('nft')" id="btn-nft">🧾 NFT</button>
+  <button onclick="showSection('wallet')" id="btn-wallet">💰 Ví</button>
+  <button onclick="showSection('profile')" id="btn-profile">👤 Thông tin</button>
+</nav>
+
+<section id="home" class="active">
+  <h2>📢 Thông báo từ Admin</h2>
+  <div class="marquee"><span id="admin-notice">Chào mừng bạn đến với Smart Mall - Giao dịch thông minh, cộng đồng bền vững!</span></div>
+</section>
+
+<section id="session">
+  <h2>🕒 Phiên giao dịch</h2>
+  <div class="date-tab-bar" id="sessionDateTabs"></div>
+  <p>Ngày phiên đã chọn: <span id="selectedDateText">(chưa chọn)</span></p>
+  <p>Thời gian phiên: <b>12:00</b></p>
+  <p>Đã đăng ký: <span id="registeredCount">0</span></p>
+  <p>Thành viên dưới đăng ký: <span id="belowRegistered">0</span></p>
+  <div id="registrationBox">
+    <button onclick="showRegisterModal()">Đăng ký phiên</button>
   </div>
-
-  <!-- 2. Navigation -->
-  <nav>
-    <button id="btn-home" class="active" onclick="showSection('home')"></button>
-    <button id="btn-session" onclick="showSection('session')"></button>
-    <button id="btn-nft" onclick="showSection('nft')"></button>
-    <button id="btn-wallet" onclick="showSection('wallet')"></button>
-    <button id="btn-profile" onclick="showSection('profile')"></button>
-  </nav>
-
-  <!-- 3. Home -->
-  <section id="home" class="active">
-    <h2 id="homeTitle"></h2>
-    <p id="adminNotice"></p>
-  </section>
-
-  <!-- 4. Session -->
-  <section id="session">
-    <h2 id="sessionTitle"></h2>
-    <div class="date-tab-bar" id="sessionDateTabs"></div>
-    <p><b id="selectedDateText"></b></p>
-    <div id="registrationBox">
-      <button id="registerBtn" onclick="showRegisterModal()"></button>
-    </div>
-    <div id="joinContainer" style="display:none">
-      <button id="joinBtn" class="small" onclick="joinSession()"></button>
-    </div>
-    <div id="products" style="display:none">
-      <h3 id="productsTodayTitle"></h3>
-      <div id="productList"></div>
-      <h3 id="productsPendingTitle"></h3>
-      <div id="pendingSaleList"></div>
-    </div>
-  </section>
-
-  <!-- 5. NFT -->
-  <section id="nft">
-    <h2 id="nftTitle"></h2>
-    <div id="nftList"></div>
-    <p id="totalSpentLabel"><span id="totalSpent">0</span></p>
-  </section>
-
-  <!-- 6. Wallet -->
-  <section id="wallet">
-    <h2 id="walletTitle"></h2>
-    <p><span id="walletBalance">100000</span> SML</p>
-    <button id="depositBtn" onclick="showDeposit()"></button>
-    <button id="transferBtn" onclick="showTransfer()"></button>
-    <button id="withdrawBtn" onclick="showWithdraw()"></button>
-    <div id="walletAction"></div>
-    <h3 id="walletHistoryTitle"></h3>
-    <div id="walletHistory">Chưa có giao dịch</div>
-  </section>
-
-  <!-- 7. Profile -->
-  <section id="profile">
-    <h2 id="profileTitle"></h2>
-    <input id="username" type="text" placeholder=""/>
-    <input id="phone"    type="text" placeholder=""/>
-    <input id="fullname" type="text" placeholder=""/>
-    <input id="bep20"    type="text" placeholder=""/>
-    <button id="saveProfileBtn" onclick="saveProfile()"></button>
-  </section>
-
-  <!-- 8. Register Modal -->
-  <div class="modal" id="registerModal">
-    <div class="modal-content">
-      <h3 id="registerModalTitle"></h3>
-      <input type="number" id="registerAmount" placeholder=""/>
-      <button id="registerModalConfirm" onclick="confirmRegister()"></button>
-      <button id="registerModalCancel"  onclick="closeRegisterModal()"></button>
-    </div>
+  <div id="joinBtn" style="display:none">
+    <button onclick="joinSession()">Tham gia phiên</button>
   </div>
+  <div id="products" style="display:none"></div>
+</section>
+
+<section id="nft">
+  <h2>🧾 NFT của tôi</h2>
+  <div id="nftTabs">
+    <button onclick="showNFTTab('current')">Sản phẩm đã mua</button>
+    <button onclick="showNFTTab('history')">Lịch sử</button>
+  </div>
+  <div id="nft-current"></div>
+  <div id="nft-history" style="display:none"></div>
+</section>
+
+<section id="wallet">
+  <h2>💰 Ví SML</h2>
+  <p>Số dư: <span id="walletBalance">1000000.00</span> SML</p>
+  <button onclick="showDeposit()">Nạp</button>
+  <button onclick="showTransfer()">Chuyển</button>
+  <button onclick="showWithdraw()">Rút</button>
+  <div id="walletAction"></div>
+</section>
+
+<section id="profile">
+  <h2>👤 Thông tin cá nhân</h2>
+  <input id="username" type="text" placeholder="Tên (viết liền)" />
+  <input id="phone" type="text" placeholder="Số điện thoại" />
+  <input id="fullname" type="text" placeholder="Họ tên đầy đủ" />
+  <input id="bep20" type="text" placeholder="Địa chỉ ví BEP20" />
+  <button onclick="saveProfile()">Lưu thông tin</button>
+</section>
+
+<div class="modal" id="registerModal">
+  <div class="modal-content">
+    <h3>Trừ 20000 SML để đăng ký phiên</h3>
+    <p>Số dư hiện tại: <span id="modalWalletBalance"></span> SML</p>
+    <input type="number" id="registerAmount" placeholder="Số tiền dự kiến mua" />
+    <button onclick="confirmRegister()">Xác nhận</button>
+  </div>
+</div>
 
 <script>
-  // TRANSLATIONS (vi & en; others fallback to en)
-  const translations = {
-    vi: { navHome:"🏠 Trang chủ",navSession:"🕒 Phiên",navNFT:"🧾 NFT",navWallet:"💰 Ví",navProfile:"👤 Thông tin",
-          homeTitle:"📢 Thông báo từ Admin",adminNotice:"Chào mừng bạn đến với Smart Mall!",
-          sessionTitle:"🕒 Phiên giao dịch",productsTodayTitle:"Sản phẩm bán trong phiên",productsPendingTitle:"Sản phẩm đang treo bán (phiên tiếp theo)",
-          registerBtn:"Đăng ký phiên (20 000 SML)",joinBtn:"Tham gia phiên",
-          nftTitle:"🧾 NFT của tôi",totalSpentLabel:"Tổng chi tiêu: ",
-          walletTitle:"💰 Ví SML",depositBtn:"Nạp",transferBtn:"Chuyển",withdrawBtn:"Rút",walletHistoryTitle:"Lịch sử SML",
-          profileTitle:"👤 Thông tin cá nhân",usernamePh:"Tên (viết liền)",phonePh:"Số điện thoại",fullnamePh:"Họ tên đầy đủ",bep20Ph:"Địa chỉ ví BEP20",saveProfileBtn:"Lưu thông tin",
-          registerModalTitle:"Phí đăng ký: 20 000 SML",registerModalConfirm:"Xác nhận",registerModalCancel:"Hủy",registerAmountPh:"Số tiền dự kiến mua"},
-    en: { navHome:"🏠 Home",navSession:"🕒 Session",navNFT:"🧾 My NFTs",navWallet:"💰 Wallet",navProfile:"👤 Profile",
-          homeTitle:"📢 Admin Notice",adminNotice:"Welcome to Smart Mall!",
-          sessionTitle:"🕒 Trading Session",productsTodayTitle:"Today's Listings",productsPendingTitle:"Pending Sales (Next Session)",
-          registerBtn:"Register (20,000 SML)",joinBtn:"Join Session",
-          nftTitle:"🧾 My NFTs",totalSpentLabel:"Total Spent: ",
-          walletTitle:"💰 SML Wallet",depositBtn:"Deposit",transferBtn:"Transfer",withdrawBtn:"Withdraw",walletHistoryTitle:"SML History",
-          profileTitle:"👤 Profile",usernamePh:"Username (no spaces)",phonePh:"Phone number",fullnamePh:"Full name",bep20Ph:"BEP20 address",saveProfileBtn:"Save Profile",
-          registerModalTitle:"Registration Fee: 20,000 SML",registerModalConfirm:"Confirm",registerModalCancel:"Cancel",registerAmountPh:"Expected amount"}
-  };
-  ["es","fr","de","zh","ja","ko","ru","pt","ar","it","nl","tr","sv","id","th","ms"]
-    .forEach(l=>translations[l]=translations.en);
+function showSection(sectionId) {
+  document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('btn-' + sectionId).classList.add('active');
+}
 
-  function applyLanguage(lang){
-    const t=translations[lang]||translations.en;
-    // nav
-    ["home","session","nft","wallet","profile"].forEach(id=>{
-      document.getElementById("btn-"+id).innerText = t["nav"+id.charAt(0).toUpperCase()+id.slice(1)];
-    });
-    // sections/buttons
-    document.getElementById("homeTitle").innerText   = t.homeTitle;
-    document.getElementById("adminNotice").innerText = t.adminNotice;
-    document.getElementById("sessionTitle").innerText       = t.sessionTitle;
-    document.getElementById("productsTodayTitle").innerText = t.productsTodayTitle;
-    document.getElementById("productsPendingTitle").innerText = t.productsPendingTitle;
-    document.getElementById("registerBtn").innerText        = t.registerBtn;
-    document.getElementById("joinBtn").innerText            = t.joinBtn;
-    document.getElementById("nftTitle").innerText          = t.nftTitle;
-    document.getElementById("totalSpentLabel").firstChild.nodeValue = t.totalSpentLabel;
-    document.getElementById("walletTitle").innerText       = t.walletTitle;
-    document.getElementById("depositBtn").innerText        = t.depositBtn;
-    document.getElementById("transferBtn").innerText       = t.transferBtn;
-    document.getElementById("withdrawBtn").innerText       = t.withdrawBtn;
-    document.getElementById("walletHistoryTitle").innerText = t.walletHistoryTitle;
-    document.getElementById("profileTitle").innerText      = t.profileTitle;
-    document.getElementById("username").placeholder        = t.usernamePh;
-    document.getElementById("phone").placeholder           = t.phonePh;
-    document.getElementById("fullname").placeholder        = t.fullnamePh;
-    document.getElementById("bep20").placeholder           = t.bep20Ph;
-    document.getElementById("saveProfileBtn").innerText    = t.saveProfileBtn;
-    document.getElementById("registerModalTitle").innerText= t.registerModalTitle;
-    document.getElementById("registerModalConfirm").innerText = t.registerModalConfirm;
-    document.getElementById("registerModalCancel").innerText  = t.registerModalCancel;
-    document.getElementById("registerAmount").placeholder     = t.registerAmountPh;
-  }
+function showRegisterModal() {
+  const modal = document.getElementById('registerModal');
+  const balanceSpan = document.getElementById('modalWalletBalance');
+  const walletBalance = document.getElementById('walletBalance').innerText;
+  balanceSpan.innerText = walletBalance;
+  modal.style.display = 'flex';
+}
 
-  // UTILS
-  function fmt(n){return n.toLocaleString('vi-VN');}
+function confirmRegister() {
+  const modal = document.getElementById('registerModal');
+  const amountInput = document.getElementById('registerAmount');
+  const registerAmount = parseFloat(amountInput.value);
+  const balanceElement = document.getElementById('walletBalance');
+  let balance = parseFloat(balanceElement.innerText);
 
-  // STATE
-  let walletBalance=100000, registeredFee=false, selectedDate=null;
-  const registerFee=20000; let totalSpent=0;
-  let products=[
-    {id:'012345678901234567890123',name:'Tai nghe Bluetooth',price:50000,seller:'Admin'},
-    {id:'123456789012345678901234',name:'Quạt mini USB',price:30000,seller:'Admin'},
-    {id:'234567890123456789012345',name:'Bàn phím cơ mini',price:70000,seller:'Admin'}
-  ];
-  let userNFT=[], pendingSales=[], walletHistory=[];
-
-  // NAV & SECTIONS
-  function showSection(id){
-    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-    document.getElementById('btn-'+id).classList.add('active');
+  if (balance >= 20000) {
+    balance -= 20000;
+    balanceElement.innerText = balance.toFixed(2);
+    alert("Đăng ký phiên thành công với số tiền dự kiến mua: " + registerAmount);
+    modal.style.display = 'none';
+    document.getElementById("registrationBox").innerHTML = '<p>Đã đăng ký</p>';
+    document.getElementById("joinBtn").style.display = 'block';
+  } else {
+    alert("Không đủ SML để đăng ký phiên. Vui lòng nạp thêm.");
   }
-
-  // SESSION DATE TABS
-  function generateSessionTabs(){
-    const c=document.getElementById('sessionDateTabs'),
-          t=document.getElementById('selectedDateText'),
-          today=new Date();
-    for(let i=0;i<7;i++){
-      const d=new Date(today); d.setDate(today.getDate()+i);
-      const lbl=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
-      const btn=document.createElement('button');
-      btn.textContent=lbl;
-      btn.onclick=()=>{
-        document.querySelectorAll('.date-tab-bar button').forEach(x=>x.classList.remove('active'));
-        btn.classList.add('active'); selectedDate=lbl; t.textContent=lbl;
-      };
-      if(i===0){btn.classList.add('active'); selectedDate=lbl; t.textContent=lbl;}
-      c.appendChild(btn);
-    }
-  }
-
-  // WALLET DISPLAY & HISTORY
-  function updateWalletDisplay(){
-    document.getElementById('walletBalance').innerText=fmt(walletBalance);
-  }
-  function addHistory(desc,delta){
-    walletHistory.unshift({desc,delta,time:new Date().toLocaleString('vi-VN')});
-    renderHistory();
-  }
-  function renderHistory(){
-    const h=document.getElementById('walletHistory');
-    if(!walletHistory.length){h.innerText='Chưa có giao dịch';return;}
-    h.innerHTML=walletHistory.map(x=>{
-      const cls=x.delta<0?'neg':'pos';
-      return `<div>[${x.time}] <span class="${cls}">${x.delta>0?'+':''}${fmt(Math.abs(x.delta))}</span> SML – ${x.desc}</div>`;
-    }).join('');
-  }
-
-  // REGISTER SESSION
-  function showRegisterModal(){
-    if(walletBalance<registerFee) return alert('Không đủ SML!');
-    document.getElementById('registerModal').style.display='flex';
-  }
-  function closeRegisterModal(){document.getElementById('registerModal').style.display='none';}
-  function confirmRegister(){
-    const amt=parseFloat(document.getElementById('registerAmount').value);
-    if(isNaN(amt)||amt<=0) return alert('Nhập số tiền hợp lệ!');
-    walletBalance-=registerFee; updateWalletDisplay(); addHistory('Phí đăng ký phiên',-registerFee);
-    registeredFee=true; closeRegisterModal();
-    document.getElementById('registrationBox').innerHTML=`<p>Đã đăng ký: ${fmt(amt)}</p>`;
-    document.getElementById('joinContainer').style.display='block';
-  }
-
-  // JOIN SESSION
-  function joinSession(){
-    if(registeredFee){
-      walletBalance+=registerFee; updateWalletDisplay(); addHistory('Hoàn phí đăng ký',+registerFee);
-      registeredFee=false;
-    }
-    document.getElementById('products').style.display='block';
-    renderProducts();
-    renderPendingSales();
-  }
-
-  // PRODUCTS TODAY
-  function renderProducts(){
-    const list=document.getElementById('productList'); list.innerHTML='';
-    products.forEach(p=>{
-      list.innerHTML+=`
-        <div class="product">
-          <b>${p.name}</b><br>ID: ${p.id}<br>Giá: ${fmt(p.price)}<br>Người bán: ${p.seller}
-          <button class="small" onclick="buyProduct('${p.id}')">Mua</button>
-        </div>`;
-    });
-  }
-
-  function buyProduct(id){
-    const p=products.find(x=>x.id===id); if(!p)return;
-    userNFT.push({...p,status:'bought'});
-    products=products.filter(x=>x.id!==id);
-    renderProducts(); renderNFTs();
-  }
-
-  // PENDING SALES: chỉ hiển thị khi sellDate==selectedDate
-  function renderPendingSales(){
-    const list=document.getElementById('pendingSaleList');
-    list.innerHTML='';
-    if(!selectedDate) return;
-    pendingSales
-      .filter(s=>s.sellDate===selectedDate)
-      .forEach(s=>{
-        list.innerHTML+=`
-          <div class="sale-item">
-            <b>${s.name}</b><br>ID: ${s.id}<br>Giá bán: ${fmt(s.salePrice)}<br>
-            Phí: ${fmt(s.saleFee)}<br>Ngày gửi: ${s.sellDateTime}<br>Phiên: ${s.sellDate}<br>
-            <button class="small" onclick="buyPendingSale('${s.id}')">Mua</button>
-          </div>`;
-      });
-  }
-
-  function buyPendingSale(id){
-    const idx=pendingSales.findIndex(s=>s.id===id);
-    if(idx===-1) return;
-    const s=pendingSales[idx];
-    if(walletBalance<s.salePrice) return alert('Không đủ SML để mua!');
-    walletBalance-=s.salePrice; updateWalletDisplay(); addHistory(`Mua ${s.name}`, -s.salePrice);
-    userNFT.push({...s,status:'bought'});
-    totalSpent+=s.salePrice;
-    pendingSales.splice(idx,1);
-    renderPendingSales(); renderNFTs();
-    alert(`Bạn đã mua "${s.name}" thành công!`);
-  }
-
-  // NFT LOGIC
-  function renderNFTs(){
-    const c=document.getElementById('nftList'); c.innerHTML=''; let tot=0;
-    if(!userNFT.length){c.innerText='Chưa có sản phẩm nào.';}
-    else userNFT.forEach(it=>{
-      tot+=it.price;
-      let h=`<div class="nft-item"><b>${it.name}</b><br>ID: ${it.id}<br>Giá mua: ${fmt(it.price)}<br>Người bán: ${it.seller}<br>`;
-      if(it.status==='bought'){h+=`<button class="small" onclick="markPaid('${it.id}')">Đã thanh toán</button>`;}
-      else if(it.status==='owned'){h+=`<button class="small" onclick="openNFT('${it.id}')">Mở</button>
-           <button class="small" onclick="sellNFT('${it.id}')">Bán</button>`;}
-      else if(it.status==='pendingSale'){h+=`Trạng thái: <i>Chờ bán</i><br>Giá bán: ${fmt(it.salePrice)}<br>
-           Phí: ${fmt(it.saleFee)}<br>Ngày gửi: ${it.sellDateTime}<br>Phiên: ${it.sellDate}`;}
-      h+='</div>'; c.innerHTML+=h;
-    });
-    document.getElementById('totalSpent').innerText=fmt(tot);
-  }
-
-  function markPaid(id){
-    const it=userNFT.find(x=>x.id===id); if(!it)return;
-    if(walletBalance<it.price)return alert('Không đủ SML!');
-    walletBalance-=it.price; updateWalletDisplay(); addHistory('Thanh toán',-it.price);
-    it.status='owned'; renderNFTs();
-  }
-
-  function openNFT(id){
-    const it=userNFT.find(x=>x.id===id); if(!it)return;
-    const rf=it.price*0.9; walletBalance+=rf; updateWalletDisplay(); addHistory('Hoàn NFT',rf);
-    it.status='opened'; renderNFTs(); alert(`Bạn nhận ${fmt(rf)} SML`);
-  }
-
-  function sellNFT(id){
-    const it=userNFT.find(x=>x.id===id); if(!it)return;
-    const profit=it.price*0.015, fee=it.price*0.034, salePrice=it.price+profit+fee;
-    if(walletBalance<fee)return alert('Không đủ SML trả phí!');
-    walletBalance-=fee; updateWalletDisplay(); addHistory('Phí gửi bán',-fee);
-    const now=new Date(), dt=now.toLocaleString('vi-VN');
-    const tm=new Date(now); tm.setDate(now.getDate()+1);
-    const sd=`${String(tm.getDate()).padStart(2,'0')}/${String(tm.getMonth()+1).padStart(2,'0')}`;
-    it.status='pendingSale'; it.salePrice=salePrice; it.saleFee=fee; it.sellDateTime=dt; it.sellDate=sd;
-    pendingSales.push({...it});
-    renderNFTs(); renderPendingSales(); alert(`Chờ bán phiên ${sd}`);
-  }
-
-  // WALLET ACTIONS
-  function showDeposit(){
-    document.getElementById('walletAction').innerHTML=`
-      <h3>Nạp SML</h3>
-      <p>Chuyển USDT (BEP20) đến:<br><code>0xYourWalletAddress</code></p>
-      <input type="number" id="depositAmt" placeholder="Số SML cần nạp"/>
-      <button onclick="confirmDeposit()">Xác nhận nạp</button>`;
-  }
-  function confirmDeposit(){
-    const amt=parseFloat(document.getElementById('depositAmt').value);
-    if(isNaN(amt)||amt<=0)return alert('Nhập số hợp lệ!');
-    walletBalance+=amt; updateWalletDisplay(); addHistory('Nạp SML',amt);
-    document.getElementById('walletAction').innerHTML='';
-  }
-
-  function showTransfer(){
-    document.getElementById('walletAction').innerHTML=`
-      <h3>Chuyển SML</h3>
-      <input type="text" id="transferTo" placeholder="Người nhận"/>
-      <input type="number" id="transferAmt" placeholder="Số SML cần chuyển"/>
-      <button onclick="confirmTransfer()">Xác nhận chuyển</button>`;
-  }
-  function confirmTransfer(){
-    const to=document.getElementById('transferTo').value.trim();
-    const amt=parseFloat(document.getElementById('transferAmt').value);
-    if(!to)return alert('Nhập người nhận!');
-    if(isNaN(amt)||amt<=0)return alert('Nhập số hợp lệ!');
-    if(walletBalance<amt)return alert('Không đủ SML!');
-    walletBalance-=amt; updateWalletDisplay(); addHistory(`Chuyển cho ${to}`,-amt);
-    document.getElementById('walletAction').innerHTML='';
-  }
-
-  function showWithdraw(){
-    document.getElementById('walletAction').innerHTML=`
-      <h3>Rút SML</h3>
-      <input type="text" id="withdrawAddr" placeholder="Địa chỉ BEP20"/>
-      <input type="number" id="withdrawAmt" placeholder="Số SML"/>
-      <p>Phí: 1.5%</p>
-      <button onclick="confirmWithdraw()">Xác nhận rút</button>`;
-  }
-  function confirmWithdraw(){
-    const addr=document.getElementById('withdrawAddr').value.trim();
-    const amt=parseFloat(document.getElementById('withdrawAmt').value);
-    if(!addr)return alert('Nhập địa chỉ rút!');
-    if(isNaN(amt)||amt<=0)return alert('Nhập số hợp lệ!');
-    const fee=amt*0.015, total=amt+fee;
-    if(walletBalance<total)return alert('Không đủ SML!');
-    walletBalance-=total; updateWalletDisplay(); addHistory(`Rút ${fmt(amt)} (+ phí ${fmt(fee)})`,-total);
-    document.getElementById('walletAction').innerHTML='';
-  }
-
-  function saveProfile(){alert('Thông tin cá nhân đã lưu.');}
-
-  // INIT
-  window.onload = ()=>{
-    generateSessionTabs();
-    applyLanguage('vi');
-    showSection('home');
-    updateWalletDisplay();
-    renderHistory();
-  };
-  document.getElementById('langSelect').addEventListener('change',e=>applyLanguage(e.target.value));
+}
 </script>
+
 </body>
 </html>
