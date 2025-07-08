@@ -1,0 +1,6 @@
+// Đổi tên thành config.js và điền token của bạn
+const GITHUB_OWNER  = 'ssadmall';
+const GITHUB_REPO   = 'smartmall-dapp';
+const GITHUB_BRANCH = 'main';
+// Tạo PAT với quyền repo
+const GITHUB_TOKEN  = 'ghp_YOUR_TOKEN_HERE';
