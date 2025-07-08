@@ -109,6 +109,13 @@ nav .nav-btn.active, nav .nav-btn:hover {
   background: #21e6c1;
   color: #162447;
 }
+.wallet-tabs button {
+  flex: 1;
+  margin: 4px 2px;
+}
+#walletAction {
+  margin-top: 10px;
+}
 table {
   width: 100%;
   border-collapse: collapse;
