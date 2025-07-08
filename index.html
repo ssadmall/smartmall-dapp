@@ -11,14 +11,14 @@
   <!-- LOGIN -->
   <section id="login" class="show">
     <h2>🔑 Đăng nhập</h2>
-    <input id="usernameInput" placeholder="Nhập username (viết liền)"/>
+    <input id="usernameInput" placeholder="Nhập username (viết liền)" />
     <button id="loginBtn">Tiếp tục</button>
   </section>
 
   <!-- APP CHÍNH -->
   <div id="app" style="display:none">
 
-    <!-- NAV -->
+    <!-- NAVIGATION -->
     <nav>
       <button id="btn-home"    class="nav-btn" onclick="showSection('home')">🏠 Trang chủ</button>
       <button id="btn-session" class="nav-btn" onclick="showSection('session')">⏱️ Phiên</button>
@@ -44,4 +44,66 @@
       <div id="joinContainer" style="display:none">
         <button class="small" onclick="joinSession()">Tham gia phiên</button>
       </div>
-      <div id="products" style
+      <div id="products" style="display:none">
+        <h3>Sản phẩm phiên hôm nay</h3>
+        <div id="productList"></div>
+        <h3>Sản phẩm treo bán cho phiên này</h3>
+        <div id="pendingSaleList"></div>
+      </div>
+    </section>
+
+    <!-- NFT -->
+    <section id="nft">
+      <h2>🧾 NFT của tôi</h2>
+      <div id="nftList">Chưa có sản phẩm.</div>
+      <p>Tổng chi tiêu: <span id="totalSpent">0</span> USDT</p>
+      <h3>Lịch sử mua</h3>
+      <ul id="nftHistory">Chưa có lịch sử mua.</ul>
+    </section>
+
+    <!-- WALLET -->
+    <section id="wallet">
+      <h2>💰 Ví SML</h2>
+      <p>Số dư: <span id="walletBalance">100000</span> SML</p>
+      <button onclick="showDeposit()">Nạp</button>
+      <button onclick="showWithdraw()">Rút</button>
+      <div id="walletAction"></div>
+      <h3>Lịch sử yêu cầu</h3>
+      <table>
+        <thead><tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
+        <tbody id="requestHistory"></tbody>
+      </table>
+      <h3>Lịch sử giao dịch</h3>
+      <div id="walletHistory">Chưa có giao dịch.</div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile">
+      <h2>👤 Thông tin cá nhân</h2>
+      <p>Username: <b id="profileUsername"></b></p>
+      <input id="phone"    placeholder="Số điện thoại" />
+      <input id="fullname" placeholder="Họ tên đầy đủ" />
+      <input id="bep20"    placeholder="Địa chỉ ví BEP20" />
+      <button onclick="saveProfile()">Lưu thông tin</button>
+      <div id="referralSection">
+        <h3>🔗 Link giới thiệu</h3>
+        <p><a href="#" id="referralLink" target="_blank"></a></p>
+        <p>👥 Giới thiệu trực tiếp: <span id="directRefCount">0</span></p>
+        <p>🌐 Đội nhóm: <span id="teamRefCount">0</span></p>
+      </div>
+    </section>
+
+    <!-- MODAL ĐĂNG KÝ -->
+    <div class="modal" id="registerModal">
+      <div class="modal-content">
+        <h3>Phí đăng ký: 20 000 SML</h3>
+        <button onclick="confirmRegister()">Xác nhận</button>
+        <button onclick="closeRegisterModal()">Hủy</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
