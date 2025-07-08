@@ -121,3 +121,7 @@ th, td {
 }
 th { background: #1b2c45; }
 #referralSection a { word-break: break-all; color: #ffcc00; }
+
+/* màu lịch sử ví */
+.pos { color: #4caf50; }
+.neg { color: #f44336; }
