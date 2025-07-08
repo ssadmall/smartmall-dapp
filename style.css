@@ -60,7 +60,7 @@ input {
   color: #162447;
   font-weight: bold;
 }
-.product, .sale-item {
+.product, .sale-item, .nft-item {
   background: #1f4068;
   border: 1px solid #21e6c1;
   border-radius: 6px;
