@@ -2,7 +2,8 @@ body {
   background: #0a1a2f;
   color: #fff;
   font-family: Arial, sans-serif;
-  margin: 0; padding-bottom: 100px;
+  margin: 0;
+  padding-bottom: 80px;
 }
 section {
   display: none;
@@ -59,7 +60,7 @@ input {
   color: #162447;
   font-weight: bold;
 }
-.product, .nft-item, .sale-item {
+.product, .sale-item {
   background: #1f4068;
   border: 1px solid #21e6c1;
   border-radius: 6px;
@@ -79,17 +80,8 @@ input {
   color: #000;
   padding: 20px;
   border-radius: 8px;
-  width: 300px;
+  width: 280px;
 }
-#walletAction { margin-top: 10px; }
-#walletHistory {
-  margin-top: 20px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-#walletHistory div { padding: 6px 0; font-size: 14px; }
-.pos { color: #4caf50; }
-.neg { color: #f44336; }
 nav {
   position: fixed;
   bottom: 0;
