@@ -57,12 +57,14 @@
       <h2>🧾 NFT của tôi</h2>
       <div id="nftList">Chưa có sản phẩm.</div>
       <p>Tổng chi tiêu: <span id="totalSpent">0</span> USDT</p>
+      <h3>Lịch sử mua</h3>
+      <ul id="nftHistory">Chưa có lịch sử mua.</ul>
     </section>
 
     <!-- WALLET -->
     <section id="wallet">
       <h2>💰 Ví SML</h2>
-      <p>Số dư: <span id="walletBalance">100000000</span> SML</p>
+      <p>Số dư: <span id="walletBalance">100000</span> SML</p>
       <button onclick="showDeposit()">Nạp</button>
       <button onclick="showWithdraw()">Rút</button>
       <div id="walletAction"></div>
@@ -71,6 +73,8 @@
         <thead><tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
         <tbody id="requestHistory"></tbody>
       </table>
+      <h3>Lịch sử giao dịch</h3>
+      <div id="walletHistory">Chưa có giao dịch.</div>
     </section>
 
     <!-- PROFILE -->
@@ -93,7 +97,7 @@
     <div class="modal" id="registerModal">
       <div class="modal-content">
         <h3>Phí đăng ký: 20 000 SML</h3>
-        <button onclick="confirmRegister()">Xác nhận trừ 20 000 SML</button>
+        <button onclick="confirmRegister()">Xác nhận</button>
         <button onclick="closeRegisterModal()">Hủy</button>
       </div>
     </div>
