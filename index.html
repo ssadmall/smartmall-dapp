@@ -18,6 +18,7 @@
   <!-- APP CHÍNH -->
   <div id="app" style="display:none">
 
+    <!-- NAV -->
     <nav>
       <button id="btn-home"    class="nav-btn" onclick="showSection('home')">🏠 Trang chủ</button>
       <button id="btn-session" class="nav-btn" onclick="showSection('session')">⏱️ Phiên</button>
@@ -26,11 +27,13 @@
       <button id="btn-profile" class="nav-btn" onclick="showSection('profile')">👤 Thông tin</button>
     </nav>
 
+    <!-- HOME -->
     <section id="home">
       <h2>📢 Thông báo từ Admin</h2>
       <p>Chào mừng bạn đến với Smart Mall – Giao dịch thông minh, cộng đồng bền vững!</p>
     </section>
 
+    <!-- SESSION -->
     <section id="session">
       <h2>🕒 Phiên giao dịch</h2>
       <div class="date-tab-bar" id="sessionDateTabs"></div>
@@ -49,6 +52,7 @@
       </div>
     </section>
 
+    <!-- NFT -->
     <section id="nft">
       <h2>🧾 NFT của tôi</h2>
       <div id="nftList">Chưa có sản phẩm.</div>
@@ -57,6 +61,7 @@
       <ul id="nftHistory">Chưa có lịch sử.</ul>
     </section>
 
+    <!-- WALLET -->
     <section id="wallet">
       <h2>💰 Ví SML</h2>
       <p>Số dư: <span id="walletBalance">100000</span> SML</p>
@@ -67,12 +72,15 @@
       </div>
       <div id="walletAction"></div>
       <h3>Lịch sử yêu cầu</h3>
-      <table><thead><tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
-      <tbody id="requestHistory"></tbody></table>
+      <table>
+        <thead><tr><th>Loại</th><th>Số lượng</th><th>Thời gian</th><th>Trạng thái</th></tr></thead>
+        <tbody id="requestHistory"></tbody>
+      </table>
       <h3>Lịch sử giao dịch</h3>
       <div id="walletHistory">Chưa có giao dịch.</div>
     </section>
 
+    <!-- PROFILE -->
     <section id="profile">
       <h2>👤 Thông tin cá nhân</h2>
       <p>Username: <b id="profileUsername"></b></p>
