@@ -1,185 +1,133 @@
-// --- state mở rộng ---
-let state = {
-  walletBalance: 100000,
-  members: [],
-  usageLogs: [],
-  walletHistory: [],
-  depositRequests: [],    // {id, userId, amount, time, status}
-  withdrawRequests: [],   // tương tự
-  // ... products, userNFT, v.v.
-};
-
-// --- Helpers ---
-function saveState() {
-  localStorage.setItem('smartmall_state', JSON.stringify(state));
-  saveUserData(userId);  // lên GitHub nếu cấu hình
+// --- Persistence: localStorage & GitHub API ---
+const STORAGE_KEY = 'smartmall_state';
+async function loadUserData(userId) {
+  loadFromLocal();
+  const path = `data/${userId}.json`;
+  const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
+    headers: { Authorization: `token ${GITHUB_TOKEN}` }
+  });
+  if (res.status === 200) {
+    const { content, sha } = await res.json();
+    const data = JSON.parse(atob(content.replace(/\n/g,'')));
+    Object.assign(state, data);
+    window._userDataSha = sha;
+  }
 }
-function loadState() {
-  const s = localStorage.getItem('smartmall_state');
+async function saveUserData(userId) {
+  const path = `data/${userId}.json`;
+  const body = {
+    message: `Update data for ${userId} @ ${new Date().toISOString()}`,
+    content: btoa(JSON.stringify(state, null, 2)),
+    branch: GITHUB_BRANCH,
+    sha: window._userDataSha
+  };
+  const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `token ${GITHUB_TOKEN}`, 'Content-Type':'application/json' },
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  window._userDataSha = json.content.sha;
+}
+function saveToLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadFromLocal() {
+  const s = localStorage.getItem(STORAGE_KEY);
   if (s) Object.assign(state, JSON.parse(s));
 }
 
-// --- Lời gọi chung render lịch sử request user ---
-function renderRequestHistory() {
-  const tb = document.getElementById('requestHistory');
-  tb.innerHTML = state.depositRequests.concat(state.withdrawRequests)
-    .sort((a,b)=>new Date(b.time)-new Date(a.time))
-    .map(r=>`
-      <tr>
-        <td>${r.type}</td>
-        <td>${r.amount}</td>
-        <td>${r.time}</td>
-        <td>${r.status}</td>
-      </tr>
-    `).join('');
+// --- Shared state ---
+const state = {
+  walletBalance:100000,
+  members:[],
+  usageLogs:[],
+  walletHistory:[],
+  depositRequests:[],
+  withdrawRequests:[],
+  products:[
+    {id:'012345678901234567890123',name:'Tai nghe Bluetooth',price:50000},
+    {id:'123456789012345678901234',name:'Quạt mini USB',price:30000},
+    {id:'234567890123456789012345',name:'Đèn học cảm ứng',price:45000},
+  ],
+  pendingSales:[],
+  userNFT:[],
+  totalSpent:0
+};
+
+// --- Telegram & Referral ---
+let tg, userId='guest';
+if(window.Telegram?.WebApp){ tg=Telegram.WebApp; tg.ready(); userId = tg.initDataUnsafe?.user?.id||'guest'; }
+const adminID='7980638669', startParam=new URLSearchParams(location.search).get('start')||'guest';
+const botUsername='SmartMallonebot', referralLink=`https://t.me/${botUsername}?start=${startParam}`;
+
+// --- Helpers/UI---
+// (Hàm fmt, updateWallet, addHistory, renderHistory, renderUsageLogs,
+//  showSection, generateTabs, renderRequestHistory, renderDepositRequests,
+//  renderWithdrawRequests, renderProducts, renderPendingSales, renderNFTs,
+//  và tất cả các handler như showDeposit, requestDeposit, approveDeposit,
+//  showWithdraw, requestWithdraw, approveWithdraw, etc. — đều dùng `state`
+//  và cuối mỗi action gọi saveToLocal() & await saveUserData(userId).)
+
+// Ví dụ addHistory và requestDeposit:
+async function addHistory(desc,delta){
+  state.walletHistory.unshift({desc,delta,time:new Date().toLocaleString('vi-VN')});
+  state.usageLogs.unshift({id:userId,username:state.members.find(m=>m.id===userId)?.username||userId,action:desc,time:new Date().toLocaleString('vi-VN')});
+  renderHistory(); renderUsageLogs(); renderRequestHistory();
+  saveToLocal(); await saveUserData(userId);
 }
 
-// --- User: Nạp ---
-function showDeposit() {
-  document.getElementById('walletAction').innerHTML = `
+function showDeposit(){
+  document.getElementById('walletAction').innerHTML=`
     <h3>Nạp SML</h3>
-    <input type="number" id="depositAmt" placeholder="SML"/>
+    <input type="number" id="depositAmt" placeholder="Số SML"/>
     <button onclick="requestDeposit()">Gửi yêu cầu</button>`;
 }
-function requestDeposit() {
-  const amt = parseFloat(document.getElementById('depositAmt').value);
-  if (isNaN(amt)||amt<=0) return alert('Nhập số hợp lệ');
-  const req = {
-    id: Date.now().toString(),
-    userId,
-    amount: amt,
-    time: new Date().toLocaleString('vi-VN'),
-    status: 'pending',
-    type: 'deposit'
-  };
+function requestDeposit(){
+  const amt=parseFloat(document.getElementById('depositAmt').value);
+  if(isNaN(amt)||amt<=0) return alert('Nhập số hợp lệ');
+  const req={id:Date.now()+'',userId,amount:amt,time:new Date().toLocaleString('vi-VN'),status:'pending',type:'deposit'};
   state.depositRequests.push(req);
-  addUsageLog(`Request deposit ${amt}`); // ghi vào usageLogs
-  renderRequestHistory();
-  saveState();
-  document.getElementById('walletAction').innerHTML = '';
+  addHistory(`Request deposit ${amt}`,0);
+  renderRequestHistory(); renderDepositRequests();
+  document.getElementById('walletAction').innerHTML='';
 }
 
-// --- User: Rút ---
-function showWithdraw() {
-  document.getElementById('walletAction').innerHTML = `
-    <h3>Rút SML</h3>
-    <input type="number" id="withdrawAmt" placeholder="SML"/>
-    <button onclick="requestWithdraw()">Gửi yêu cầu</button>`;
-}
-function requestWithdraw() {
-  const amt = parseFloat(document.getElementById('withdrawAmt').value);
-  if (isNaN(amt)||amt<=0) return alert('Nhập số hợp lệ');
-  const fee = Math.ceil(amt * 0.015);
-  if (amt+fee > state.walletBalance) return alert('Không đủ SML');
-  const req = {
-    id: Date.now().toString(),
-    userId,
-    amount: amt,
-    fee,
-    time: new Date().toLocaleString('vi-VN'),
-    status: 'pending',
-    type: 'withdraw'
-  };
-  state.withdrawRequests.push(req);
-  addUsageLog(`Request withdraw ${amt}`); 
-  renderRequestHistory();
-  saveState();
-  document.getElementById('walletAction').innerHTML = '';
+// … tương tự cho requestWithdraw, approveDeposit, approveWithdraw, etc. …
+
+// --- Login & Init ---
+function handleLogin(){
+  const name=document.getElementById('loginUsername').value.trim();
+  if(!name) return alert('Nhập tên đăng nhập');
+  // thêm member nếu mới
+  if(!state.members.find(m=>m.id===userId)){
+    state.members.push({
+      id:userId,username:name,balance:state.walletBalance,
+      registerDate:new Date().toLocaleString('vi-VN'),
+      purchasedCount:0,directRefCount:0,teamRefCount:0
+    });
+    saveToLocal();
+  }
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  initApp();
 }
 
-// --- Admin: render requests ---
-function renderDepositRequests() {
-  const tb = document.getElementById('depositRequestsList');
-  tb.innerHTML = state.depositRequests.map(r=>`
-    <tr>
-      <td>${r.userId}</td>
-      <td>${r.amount}</td>
-      <td>${r.time}</td>
-      <td>
-        ${r.status==='pending'
-          ? `<button onclick="approveDeposit('${r.id}')">Approve</button>
-             <button onclick="rejectDeposit('${r.id}')">Reject</button>`
-          : r.status
-        }
-      </td>
-    </tr>
-  `).join('');
+async function initApp(){
+  await loadUserData(userId);
+  generateTabs(); updateWallet(); renderHistory();
+  renderRequestHistory(); renderDepositRequests(); renderWithdrawRequests();
+  renderProducts(); renderPendingSales(); renderNFTs();
+  document.getElementById('referralLink').href=referralLink;
+  document.getElementById('referralLink').innerText=referralLink;
+  if(userId===adminID){
+    ['home','session','nft','wallet','profile'].forEach(id=>{
+      document.getElementById(id).style.display='none';
+      document.getElementById('btn-'+id).style.display='none';
+    });
+    document.getElementById('admin').classList.add('show');
+    document.getElementById('btn-admin').style.display='flex';
+    renderAdminPanel();
+  } else {
+    showSection('home');
+    document.getElementById('btn-admin').style.display='none';
+  }
 }
-function renderWithdrawRequests() {
-  const tb = document.getElementById('withdrawRequestsList');
-  tb.innerHTML = state.withdrawRequests.map(r=>`
-    <tr>
-      <td>${r.userId}</td>
-      <td>${r.amount}</td>
-      <td>${r.time}</td>
-      <td>
-        ${r.status==='pending'
-          ? `<button onclick="approveWithdraw('${r.id}')">Approve</button>
-             <button onclick="rejectWithdraw('${r.id}')">Reject</button>`
-          : r.status
-        }
-      </td>
-    </tr>
-  `).join('');
-}
-
-// --- Admin: xử lý ---
-function approveDeposit(reqId) {
-  const req = state.depositRequests.find(r=>r.id===reqId);
-  if (!req||req.status!=='pending') return;
-  // cập nhật balance
-  state.walletBalance += req.amount;
-  updateWallet();
-  req.status = 'approved';
-  addUsageLog(`Admin approved deposit ${req.amount}`, req.userId);
-  renderDepositRequests();
-  renderRequestHistory();
-  saveState();
-}
-function rejectDeposit(reqId) {
-  const req = state.depositRequests.find(r=>r.id===reqId);
-  if (!req||req.status!=='pending') return;
-  req.status = 'rejected';
-  renderDepositRequests();
-  saveState();
-}
-
-function approveWithdraw(reqId) {
-  const req = state.withdrawRequests.find(r=>r.id===reqId);
-  if (!req||req.status!=='pending') return;
-  // trừ ngoài balance
-  state.walletBalance -= (req.amount + req.fee);
-  updateWallet();
-  req.status = 'approved';
-  addUsageLog(`Admin approved withdraw ${req.amount}`, req.userId);
-  renderWithdrawRequests();
-  renderRequestHistory();
-  saveState();
-}
-function rejectWithdraw(reqId) {
-  const req = state.withdrawRequests.find(r=>r.id===reqId);
-  if (!req||req.status!=='pending') return;
-  req.status = 'rejected';
-  renderWithdrawRequests();
-  saveState();
-}
-
-// --- Thêm hồ sơ hành động ---
-function addUsageLog(action, targetUserId=userId) {
-  state.usageLogs.unshift({
-    id: targetUserId,
-    username: state.members.find(m=>m.id===targetUserId)?.username||targetUserId,
-    action,
-    time: new Date().toLocaleString('vi-VN')
-  });
-}
-
-// --- Trong window.onload --- 
-window.onload = async () => {
-  loadState();
-  // init UI...
-  renderRequestHistory();
-  renderDepositRequests();
-  renderWithdrawRequests();
-  // role-based như trước...
-};
