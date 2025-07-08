@@ -2,5 +2,6 @@
 const GITHUB_OWNER  = 'ssadmall';
 const GITHUB_REPO   = 'smartmall-dapp';
 const GITHUB_BRANCH = 'main';
-// Tạo PAT với quyền repo
-const GITHUB_TOKEN  = 'ghp_YOUR_TOKEN_HERE';
+// Tạo GitHub Personal Access Token (repo scope) rồi copy vào đây.
+// Lưu ý: KHÔNG commit file config.js lên repo công khai!
+const GITHUB_TOKEN  = 'ghp_YOUR_PERSONAL_ACCESS_TOKEN';
