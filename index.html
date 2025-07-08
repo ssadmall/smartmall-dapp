@@ -1,131 +1,103 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Smart Mall DApp</title>
-  <style>
-    body { background: #0a1a2f; color: #fff; font-family: Arial, sans-serif; padding: 20px; margin: 0; margin-bottom: 80px; }
-    section { display: none; background: #162447; padding: 20px; margin-bottom: 20px; border-radius: 10px; border: 2px solid #21e6c1; }
-    section.active { display: block; }
-    h2 { color: #21e6c1; margin-bottom: 10px; }
-    input, button, textarea { padding: 8px; width: 100%; margin-top: 10px; border-radius: 4px; border: none; }
-    input, textarea { background: #1f4068; color: #fff; }
-    button { background: #21e6c1; color: #0a1a2f; font-weight: bold; cursor: pointer; }
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 999; }
-    .modal-content { background: #fff; color: #000; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; }
-    nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #162447; border-top: 2px solid #21e6c1; z-index: 1000; }
-    nav button { flex: 1; padding: 12px 0; background: #162447; border: none; color: #fff; font-weight: bold; cursor: pointer; }
-    nav button.active { background: #21e6c1; color: #162447; }
-    .date-tab-bar { display: flex; overflow-x: auto; border-bottom: 1px solid #21e6c1; padding-bottom: 4px; margin-bottom: 12px; background: #1b2c45; }
-    .date-tab-bar button { flex: 1; min-width: 60px; background: transparent; border: none; padding: 8px 6px; color: #ccc; font-weight: normal; font-size: 14px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
-    .date-tab-bar button.active { color: #ffcc00; font-weight: bold; border-bottom: 2px solid #ffcc00; }
-    .nft-item { border: 1px solid #21e6c1; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-
-<nav>
-  <button onclick="showSection('home')" id="btn-home" class="active">🏠 Trang chủ</button>
-  <button onclick="showSection('session')" id="btn-session">🕒 Phiên</button>
-  <button onclick="showSection('nft')" id="btn-nft">🧾 NFT</button>
-  <button onclick="showSection('wallet')" id="btn-wallet">💰 Ví</button>
-  <button onclick="showSection('profile')" id="btn-profile">👤 Thông tin</button>
-</nav>
-
-<section id="home" class="active">
-  <h2>📢 Thông báo từ Admin</h2>
-  <div class="marquee"><span id="admin-notice">Chào mừng bạn đến với Smart Mall - Giao dịch thông minh, cộng đồng bền vững!</span></div>
-</section>
-
-<section id="session">
-  <h2>🕒 Phiên giao dịch</h2>
-  <div class="date-tab-bar" id="sessionDateTabs"></div>
-  <p>Ngày phiên đã chọn: <span id="selectedDateText">(chưa chọn)</span></p>
-  <p>Thời gian phiên: <b>12:00</b></p>
-  <p>Đã đăng ký: <span id="registeredCount">0</span></p>
-  <p>Thành viên dưới đăng ký: <span id="belowRegistered">0</span></p>
-  <div id="registrationBox">
-    <button onclick="showRegisterModal()">Đăng ký phiên</button>
+  <!-- Language Switcher -->
+  <div id="langSwitcher">
+    <select id="langSelect">
+      <option value="vi">Tiếng Việt</option>
+      <option value="en">English</option>
+      <!-- … các ngôn ngữ khác … -->
+    </select>
   </div>
-  <div id="joinBtn" style="display:none">
-    <button onclick="joinSession()">Tham gia phiên</button>
+
+  <!-- Navigation -->
+  <nav>
+    <button id="btn-home"    class="active" onclick="showSection('home')"></button>
+    <button id="btn-session"         onclick="showSection('session')"></button>
+    <button id="btn-nft"             onclick="showSection('nft')"></button>
+    <button id="btn-wallet"          onclick="showSection('wallet')"></button>
+    <button id="btn-profile"         onclick="showSection('profile')"></button>
+  </nav>
+
+  <!-- Home -->
+  <section id="home" class="active">
+    <h2 id="homeTitle"></h2>
+    <p id="adminNotice"></p>
+  </section>
+
+  <!-- Session -->
+  <section id="session">
+    <h2 id="sessionTitle"></h2>
+    <div class="date-tab-bar" id="sessionDateTabs"></div>
+    <p><b id="selectedDateText"></b></p>
+    <div id="registrationBox">
+      <button id="registerBtn" onclick="showRegisterModal()"></button>
+    </div>
+    <div id="joinContainer" style="display:none">
+      <button id="joinBtn" class="small" onclick="joinSession()"></button>
+    </div>
+    <div id="products" style="display:none">
+      <h3 id="productsTodayTitle"></h3>
+      <div id="productList"></div>
+      <h3 id="productsPendingTitle"></h3>
+      <div id="pendingSaleList"></div>
+    </div>
+  </section>
+
+  <!-- NFT -->
+  <section id="nft">
+    <h2 id="nftTitle"></h2>
+    <div id="nftList"></div>
+    <p id="totalSpentLabel"><span id="totalSpent">0</span></p>
+  </section>
+
+  <!-- Wallet -->
+  <section id="wallet">
+    <h2 id="walletTitle"></h2>
+    <p><span id="walletBalance">100000</span> SML</p>
+    <button id="depositBtn"  onclick="showDeposit()"></button>
+    <button id="transferBtn" onclick="showTransfer()"></button>
+    <button id="withdrawBtn" onclick="showWithdraw()"></button>
+    <div id="walletAction"></div>
+    <h3 id="walletHistoryTitle"></h3>
+    <div id="walletHistory">Chưa có giao dịch</div>
+  </section>
+
+  <!-- Profile -->
+  <section id="profile">
+    <h2 id="profileTitle"></h2>
+    <input id="username" placeholder=""/>
+    <input id="phone"    placeholder=""/>
+    <input id="fullname" placeholder=""/>
+    <input id="bep20"    placeholder=""/>
+    <button id="saveProfileBtn" onclick="saveProfile()"></button>
+
+    <!-- Referral Section -->
+    <div id="referralSection" style="margin-top:20px; padding-top:10px; border-top:1px solid #21e6c1;">
+      <h3>🔗 Link giới thiệu</h3>
+      <p><a href="#" id="referralLink" target="_blank" style="color:#ffcc00;"></a></p>
+      <p>👥 Giới thiệu trực tiếp: <span id="directRefCount">0</span></p>
+      <p>🌐 Đội nhóm: <span id="teamRefCount">0</span></p>
+    </div>
+  </section>
+
+  <!-- Register Modal -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <h3 id="registerModalTitle"></h3>
+      <input type="number" id="registerAmount" placeholder=""/>
+      <button id="registerModalConfirm" onclick="confirmRegister()"></button>
+      <button id="registerModalCancel"  onclick="closeRegisterModal()"></button>
+    </div>
   </div>
-  <div id="products" style="display:none"></div>
-</section>
 
-<section id="nft">
-  <h2>🧾 NFT của tôi</h2>
-  <div id="nftTabs">
-    <button onclick="showNFTTab('current')">Sản phẩm đã mua</button>
-    <button onclick="showNFTTab('history')">Lịch sử</button>
-  </div>
-  <div id="nft-current"></div>
-  <div id="nft-history" style="display:none"></div>
-</section>
-
-<section id="wallet">
-  <h2>💰 Ví SML</h2>
-  <p>Số dư: <span id="walletBalance">1000000.00</span> SML</p>
-  <button onclick="showDeposit()">Nạp</button>
-  <button onclick="showTransfer()">Chuyển</button>
-  <button onclick="showWithdraw()">Rút</button>
-  <div id="walletAction"></div>
-</section>
-
-<section id="profile">
-  <h2>👤 Thông tin cá nhân</h2>
-  <input id="username" type="text" placeholder="Tên (viết liền)" />
-  <input id="phone" type="text" placeholder="Số điện thoại" />
-  <input id="fullname" type="text" placeholder="Họ tên đầy đủ" />
-  <input id="bep20" type="text" placeholder="Địa chỉ ví BEP20" />
-  <button onclick="saveProfile()">Lưu thông tin</button>
-</section>
-
-<div class="modal" id="registerModal">
-  <div class="modal-content">
-    <h3>Trừ 20000 SML để đăng ký phiên</h3>
-    <p>Số dư hiện tại: <span id="modalWalletBalance"></span> SML</p>
-    <input type="number" id="registerAmount" placeholder="Số tiền dự kiến mua" />
-    <button onclick="confirmRegister()">Xác nhận</button>
-  </div>
-</div>
-
-<script>
-function showSection(sectionId) {
-  document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
-  document.getElementById(sectionId).classList.add('active');
-  document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('btn-' + sectionId).classList.add('active');
-}
-
-function showRegisterModal() {
-  const modal = document.getElementById('registerModal');
-  const balanceSpan = document.getElementById('modalWalletBalance');
-  const walletBalance = document.getElementById('walletBalance').innerText;
-  balanceSpan.innerText = walletBalance;
-  modal.style.display = 'flex';
-}
-
-function confirmRegister() {
-  const modal = document.getElementById('registerModal');
-  const amountInput = document.getElementById('registerAmount');
-  const registerAmount = parseFloat(amountInput.value);
-  const balanceElement = document.getElementById('walletBalance');
-  let balance = parseFloat(balanceElement.innerText);
-
-  if (balance >= 20000) {
-    balance -= 20000;
-    balanceElement.innerText = balance.toFixed(2);
-    alert("Đăng ký phiên thành công với số tiền dự kiến mua: " + registerAmount);
-    modal.style.display = 'none';
-    document.getElementById("registrationBox").innerHTML = '<p>Đã đăng ký</p>';
-    document.getElementById("joinBtn").style.display = 'block';
-  } else {
-    alert("Không đủ SML để đăng ký phiên. Vui lòng nạp thêm.");
-  }
-}
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
