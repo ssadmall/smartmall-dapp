@@ -8,20 +8,21 @@
 </head>
 <body>
 
-  <!-- LOGIN (1 lần duy nhất) -->
+  <!-- LOGIN -->
   <section id="login" class="show">
     <h2>🔑 Đăng nhập</h2>
     <input id="usernameInput" placeholder="Nhập username (viết liền)"/>
     <button id="loginBtn">Tiếp tục</button>
   </section>
 
-  <!-- ỨNG DỤNG (ẩn khi chưa login) -->
+  <!-- APP -->
   <div id="app" style="display:none">
 
-    <!-- NAV -->
+    <!-- NAVIGATION -->
     <nav>
       <button id="btn-home"    class="nav-btn" onclick="showSection('home')">🏠 Trang chủ</button>
       <button id="btn-session" class="nav-btn" onclick="showSection('session')">⏱️ Phiên</button>
+      <button id="btn-nft"     class="nav-btn" onclick="showSection('nft')">🧾 NFT</button>
       <button id="btn-wallet"  class="nav-btn" onclick="showSection('wallet')">💰 Ví</button>
       <button id="btn-profile" class="nav-btn" onclick="showSection('profile')">👤 Thông tin</button>
     </nav>
@@ -29,7 +30,7 @@
     <!-- HOME -->
     <section id="home">
       <h2>📢 Thông báo từ Admin</h2>
-      <p id="adminNotice">Chào mừng bạn đến với Smart Mall – Giao dịch thông minh, cộng đồng bền vững!</p>
+      <p>Chào mừng bạn đến với Smart Mall – Giao dịch thông minh, cộng đồng bền vững!</p>
     </section>
 
     <!-- SESSION -->
@@ -37,24 +38,25 @@
       <h2>🕒 Phiên giao dịch</h2>
       <div class="date-tab-bar" id="sessionDateTabs"></div>
       <p>Ngày phiên đã chọn: <b id="selectedDateText"></b></p>
-
-      <!-- Đăng ký -->
       <div id="registrationBox">
         <button onclick="showRegisterModal()">Đăng ký phiên (20 000 SML)</button>
       </div>
-
-      <!-- Tham gia (hiện khi đã đăng ký hôm đó) -->
       <div id="joinContainer" style="display:none">
         <button class="small" onclick="joinSession()">Tham gia phiên</button>
       </div>
-
-      <!-- Sản phẩm -->
       <div id="products" style="display:none">
         <h3>Sản phẩm phiên hôm nay</h3>
         <div id="productList"></div>
         <h3>Sản phẩm treo bán cho phiên này</h3>
         <div id="pendingSaleList"></div>
       </div>
+    </section>
+
+    <!-- NFT -->
+    <section id="nft">
+      <h2>🧾 NFT của tôi</h2>
+      <div id="nftList">Chưa có sản phẩm.</div>
+      <p>Tổng chi tiêu: <span id="totalSpent">0</span> USDT</p>
     </section>
 
     <!-- WALLET -->
