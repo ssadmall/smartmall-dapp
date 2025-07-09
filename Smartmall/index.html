@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Smart Mall DApp</title>
+  <link rel="stylesheet" href="css/main.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <!-- Login Modal -->
+  <div id="login" class="modal show">
+    <div class="modal-content">
+      <h2>Đăng nhập</h2>
+      <input id="usernameInput" placeholder="Nhập username…" />
+      <button id="loginBtn">Đăng nhập ẩn danh</button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" style="display:none">
+    <header>
+      <img src="assets/images/logo.png" alt="Smart Mall Logo" class="logo"/>
+      <h1>Smart Mall</h1>
+    </header>
+
+    <nav id="tabs"></nav>
+
+    <main id="home">
+      <div class="marquee"></div>
+
+      <!-- Ví SMP -->
+      <section id="wallet">
+        <h2>Ví SMP</h2>
+        <p>Số dư: <span id="walletBalance">0 SMP</span></p>
+        <p>Hoa hồng trực tiếp: <span id="directCommission">0 SMP</span></p>
+        <p>Hoa hồng cấp bậc: <span id="rankCommission">0 SMP</span></p>
+      </section>
+
+      <!-- Sản phẩm -->
+      <section id="products">
+        <h2>Sản phẩm</h2>
+        <div id="productList"></div>
+      </section>
+
+      <!-- NFT của bạn -->
+      <section id="userNFTs">
+        <h2>NFT của bạn</h2>
+        <div id="nftList"></div>
+      </section>
+
+      <!-- Bán chờ xử lý -->
+      <section id="pendingSales">
+        <h2>Bán chờ xử lý</h2>
+        <div id="pendingList"></div>
+      </section>
+
+      <!-- Lịch sử giao dịch ví -->
+      <section id="walletHistory">
+        <h2>Lịch sử giao dịch ví</h2>
+        <ul id="historyList"></ul>
+      </section>
+
+      <!-- Yêu cầu nạp/rút -->
+      <section id="requests">
+        <h2>Yêu cầu nạp/rút</h2>
+        <ul id="requestList"></ul>
+      </section>
+    </main>
+
+    <!-- Modal đăng ký phiên -->
+    <div id="modal-register" class="modal">
+      <div class="modal-content">
+        <h3>Đăng ký phiên <span id="reg-date"></span></h3>
+        <button onclick="confirmRegister()">Xác nhận (20 000 SMP)</button>
+        <button onclick="closeRegisterModal()">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/firebase-init.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
