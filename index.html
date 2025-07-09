@@ -138,7 +138,7 @@
     // ===== State & Helpers =====
     const state = {
       usdtPrice:26400,
-      walletBalance:10000000,
+      walletBalance:10000000000,
       directCommission:0,
       rankCommission:0,
       registrations:[],
@@ -155,7 +155,7 @@
     const fmt = n => n.toLocaleString('vi-VN');
 
     function randomId(){
-      const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const c='abdcnuekcasepkz0123456789';
       let s='';
       for(let i=0;i<18;i++) s+=c[Math.floor(Math.random()*c.length)];
       return s;
@@ -185,7 +185,7 @@
 
     // ===== App Init =====
     function initApp(){
-      ['Tai nghe Bluetooth','','Đèn cảm ứng'].forEach((n,i)=> state.products.push({id:randomId(),name:n,price:[50000,30000,45000][i],seller:'Admin'}));
+      ['NFT1','NFT2','NFT3','NFT4','NFT5','NFT1'].forEach((n,i)=> state.products.push({id:randomId(),name:n,price:[5000000,3000000,4500000,200000000,1000000000,][i],seller:'Admin'}));
       document.getElementById('profileUsername').innerText=currentUsername;
       generateTabs();updateWallet();renderProducts();renderPendingSales();renderNFTs();renderWalletHistory();renderRequestHistory();renderNFTHistory();updateVipLevel();updateSLevel();updateCommissionUI();
     }
