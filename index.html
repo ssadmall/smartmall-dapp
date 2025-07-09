@@ -76,7 +76,7 @@
       <h2>🕒 Phiên giao dịch</h2>
       <div class="date-tab-bar" id="sessionDateTabs"></div>
       <p>Phiên: <b id="selectedDateText"></b></p>
-      <div id="registrationBox"><button onclick="showRegisterModal()">Đăng ký phiên (20 000 SML)</button></div>
+      <div id="registrationBox"><button onclick="showRegisterModal()">Đăng ký phiên (20,000 SML)</button></div>
       <div id="joinContainer" style="display:none"><button class="small" onclick="joinSession()">Tham gia phiên</button></div>
       <div id="products" style="display:none">
         <h3>Sản phẩm hôm nay</h3>
@@ -122,10 +122,10 @@
     </section>
 
     <!-- MODALS -->
-    <div class="modal" id="registerModal"><div class="modal-content"><h3>Phí đăng ký: 20 000 SML</h3><button onclick="confirmRegister()">Xác nhận</button><button onclick="closeRegisterModal()">Hủy</button></div></div>
+    <div class="modal" id="registerModal"><div class="modal-content"><h3>Phí đăng ký: 20,000 SML</h3><button onclick="confirmRegister()">Xác nhận</button><button onclick="closeRegisterModal()">Hủy</button></div></div>
     <div class="modal" id="sellModal"><div class="modal-content"><h3>Bán NFT</h3><p>ID: <span id="sellId"></span></p><p>Giá mua: <b id="sellCost"></b> SML</p><p>Lợi nhuận: <b id="sellProfit"></b> SML</p><p>Phí gửi bán: <b id="sellFee"></b> SML</p><button onclick="confirmSell()">Xác nhận</button><button onclick="closeSellModal()">Hủy</button></div></div>
     <div class="modal" id="depositModal"><div class="modal-content"><h3>Chuyển USDT BEP20</h3><code id="depositAddress">0xYourBEP20</code><button class="small" onclick="copyAddress()">Copy</button><p>Giá USDT: <span id="usdtPrice">26 400</span> VND</p><input id="depositSML" type="number" placeholder="SML muốn nạp"/><p id="requiredUSDT">Cần: 0 USDT</p><button onclick="submitDeposit()">Gửi yêu cầu</button><button onclick="closeDepositModal()">Hủy</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><h3>Rút SML (min 1 000 000)</h3><input id="withdrawAmt" type="number" placeholder="SML rút"/><button onclick="submitWithdraw()">Gửi</button><button onclick="closeWithdrawModal()">Hủy</button></div></div>
+    <div class="modal" id="withdrawModal"><div class="modal-content"><h3>Rút SML (min 1,000,000)</h3><input id="withdrawAmt" type="number" placeholder="SML rút"/><button onclick="submitWithdraw()">Gửi</button><button onclick="closeWithdrawModal()">Hủy</button></div></div>
 
   </div>
 
@@ -162,8 +162,8 @@
 
     // ===== App Init =====
     function initApp(){
-      ['Tai nghe Bluetooth','Quạt mini USB','Đèn cảm ứng'].forEach((n,i)=>{
-        state.products.push({id:randomId(),name:n,price:[50000,30000,45000][i],seller:'Admin'});
+      ['NFT1','NFT2','NFT3'].forEach((n,i)=>{
+        state.products.push({id:randomId(),name:n,price:[500000,300000,450000][i],seller:'Admin'});
       });
       document.getElementById('profileUsername').innerText=currentUsername;
       generateTabs();updateWallet();
