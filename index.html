@@ -76,7 +76,7 @@
       <h2>🕒 Phiên giao dịch</h2>
       <div class="date-tab-bar" id="sessionDateTabs"></div>
       <p>Phiên: <b id="selectedDateText"></b></p>
-      <div id="registrationBox"><button onclick="showRegisterModal()">Đăng ký phiên (20,000 SML)</button></div>
+      <div id="registrationBox"><button onclick="showRegisterModal()">Đăng ký phiên (20 000 SML)</button></div>
       <div id="joinContainer" style="display:none"><button class="small" onclick="joinSession()">Tham gia phiên</button></div>
       <div id="products" style="display:none">
         <h3>Sản phẩm hôm nay</h3>
@@ -116,16 +116,16 @@
       <input id="phone" placeholder="Số điện thoại"/><input id="fullname" placeholder="Họ tên đầy đủ"/><input id="bep20" placeholder="Ví BEP20"/>
       <button onclick="saveProfile()">Lưu</button>
       <h3>🔗 Referral</h3><p><a id="referralLink" href="#" target="_blank"></a></p>
-      <p>Trực tiếp: <span id="directRefCount">0</span> Đội nhóm: <span id="teamRefCount">0</span></p>
+      <p>Trực tiếp: <span id="directRefCount">0</span>   Đội nhóm: <span id="teamRefCount">0</span></p>
       <p>Doanh số nhóm: <b id="teamSalesDisplay">0</b> VND</p>
       <div id="ranks"><h3>🎖️ Cấp bậc</h3><p>VIP: <b id="vipLevel">VIP0</b> (<span id="vipDays">0</span> ngày)</p><p>Lợi nhuận: <b id="vipProfitRate">1.5%</b></p><hr style="border-color:#21e6c1;margin:6px 0;"><p>S-Level: <b id="sLevel">S0</b></p><p>Hoa hồng đội: <b id="sCommissionRate">0%</b></p></div>
     </section>
 
     <!-- MODALS -->
-    <div class="modal" id="registerModal"><div class="modal-content"><h3>Phí đăng ký: 20,000 SML</h3><button onclick="confirmRegister()">Xác nhận</button><button onclick="closeRegisterModal()">Hủy</button></div></div>
+    <div class="modal" id="registerModal"><div class="modal-content"><h3>Phí đăng ký: 20 000 SML</h3><button onclick="confirmRegister()">Xác nhận</button><button onclick="closeRegisterModal()">Hủy</button></div></div>
     <div class="modal" id="sellModal"><div class="modal-content"><h3>Bán NFT</h3><p>ID: <span id="sellId"></span></p><p>Giá mua: <b id="sellCost"></b> SML</p><p>Lợi nhuận: <b id="sellProfit"></b> SML</p><p>Phí gửi bán: <b id="sellFee"></b> SML</p><button onclick="confirmSell()">Xác nhận</button><button onclick="closeSellModal()">Hủy</button></div></div>
     <div class="modal" id="depositModal"><div class="modal-content"><h3>Chuyển USDT BEP20</h3><code id="depositAddress">0xYourBEP20</code><button class="small" onclick="copyAddress()">Copy</button><p>Giá USDT: <span id="usdtPrice">26 400</span> VND</p><input id="depositSML" type="number" placeholder="SML muốn nạp"/><p id="requiredUSDT">Cần: 0 USDT</p><button onclick="submitDeposit()">Gửi yêu cầu</button><button onclick="closeDepositModal()">Hủy</button></div></div>
-    <div class="modal" id="withdrawModal"><div class="modal-content"><h3>Rút SML (min 1,000,000)</h3><input id="withdrawAmt" type="number" placeholder="SML rút"/><button onclick="submitWithdraw()">Gửi</button><button onclick="closeWithdrawModal()">Hủy</button></div></div>
+    <div class="modal" id="withdrawModal"><div class="modal-content"><h3>Rút SML (min 1 000 000)</h3><input id="withdrawAmt" type="number" placeholder="SML rút"/><button onclick="submitWithdraw()">Gửi</button><button onclick="closeWithdrawModal()">Hủy</button></div></div>
 
   </div>
 
@@ -138,13 +138,14 @@
     };
     let currentUsername='', selectedDate='', sellContext=null;
     const fmt = n => n.toLocaleString('vi-VN');
+
     function randomId(){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';let s='';for(let i=0;i<18;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
     function randomColor(){return `hsl(${Math.random()*360|0},40%,30%)`;}
     function addWalletHistory(desc,delta){state.walletHistory.unshift({desc,delta,time:new Date().toLocaleString('vi-VN')});renderWalletHistory();}
     function showSection(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('btn-'+id).classList.add('active');}
     function updateWallet(){document.getElementById('walletBalance').innerText=fmt(state.walletBalance);}
-    function updateCommissionUI(){document.getElementById('directCommission').innerText=fmt(state.directCommission);document.getElementById('rankCommission').innerText=fmt(state.rankCommission);document.getElementById('teamSalesDisplay').innerText=fmt(state.teamSales);}
-    function vipRate(){return parseFloat(document.getElementById('vipProfitRate').innerText);}
+    function updateCommissionUI(){document.getElementById('directCommission').innerText=fmt(state.directCommission);document.getElementById('rankCommission').innerText=fmt(state.rankCommission);document.getElementById('teamSalesDisplay').innerText=fmt(state.teamSales);}    
+    function vipRate(){return parseFloat(document.getElementById('vipProfitRate').innerText);}    
 
     // ===== Login Init =====
     document.getElementById('loginBtn').onclick=()=>{
@@ -162,173 +163,37 @@
 
     // ===== App Init =====
     function initApp(){
-      ['NFT1','NFT2','NFT3'].forEach((n,i)=>{
+      ['NFT 1','NFT 2',' NFT3'].forEach((n,i)=>{
         state.products.push({id:randomId(),name:n,price:[500000,300000,450000][i],seller:'Admin'});
       });
       document.getElementById('profileUsername').innerText=currentUsername;
-      generateTabs();updateWallet();
-      renderProducts();renderPendingSales();renderNFTs();
-      renderWalletHistory();renderRequestHistory();renderNFTHistory();
-      updateVipLevel();updateSLevel();updateCommissionUI();
+      generateTabs();updateWallet();renderProducts();renderPendingSales();renderNFTs();renderWalletHistory();renderRequestHistory();renderNFTHistory();updateVipLevel();updateSLevel();updateCommissionUI();
     }
 
     // ===== Session Tabs =====
-    function generateTabs(){
-      const c=document.getElementById('sessionDateTabs'),txt=document.getElementById('selectedDateText'),t=new Date();
-      for(let i=0;i<7;i++){
-        const d=new Date(t);d.setDate(t.getDate()+i);
-        const lbl=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
-        const btn=document.createElement('button');
-        btn.textContent=lbl;btn.onclick=()=>{
-          c.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
-          btn.classList.add('active');selectedDate=lbl;txt.textContent=lbl;updateSessionUI();
-        };
-        if(i===0){btn.classList.add('active');selectedDate=lbl;txt.textContent=lbl;}
-        c.appendChild(btn);
-      }
-      updateSessionUI();
-    }
-    function updateSessionUI(){
-      const reg=state.registrations.find(r=>r.date===selectedDate);
-      document.getElementById('registrationBox').style.display=reg?'none':'block';
-      document.getElementById('joinContainer').style.display=reg?'block':'none';
-      document.getElementById('products').style.display='none';
-    }
+    function generateTabs(){const c=document.getElementById('sessionDateTabs'),txt=document.getElementById('selectedDateText'),t=new Date();for(let i=0;i<7;i++){const d=new Date(t);d.setDate(t.getDate()+i);const lbl=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;const btn=document.createElement('button');btn.textContent=lbl;btn.onclick=()=>{c.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');selectedDate=lbl;txt.textContent=lbl;updateSessionUI();};if(i===0){btn.classList.add('active');selectedDate=lbl;txt.textContent=lbl;}c.appendChild(btn);}updateSessionUI();}
+    function updateSessionUI(){const reg=state.registrations.find(r=>r.date===selectedDate);document.getElementById('registrationBox').style.display=reg?'none':'block';document.getElementById('joinContainer').style.display=reg?'block':'none';document.getElementById('products').style.display='none';}
     function showRegisterModal(){if(state.walletBalance<20000)return alert('Không đủ 20 000 SML');document.getElementById('registerModal').classList.add('show');}
     function closeRegisterModal(){document.getElementById('registerModal').classList.remove('show');}
-    function confirmRegister(){
-      state.walletBalance-=20000;updateWallet();addWalletHistory('Phí đăng ký phiên',-20000);
-      state.registrations.push({date:selectedDate,time:Date.now()});
-      closeRegisterModal();updateSessionUI();updateVipLevel();alert(`Đã đăng ký phiên ${selectedDate}`);
-    }
-    function joinSession(){
-      if(!state.registrations.find(r=>r.date===selectedDate))return alert('Chưa đăng ký phiên');
-      document.getElementById('products').style.display='block';
-      renderProducts();renderPendingSales();
-    }
+    function confirmRegister(){state.walletBalance-=20000;updateWallet();addWalletHistory('Phí đăng ký phiên',-20000);state.registrations.push({date:selectedDate,time:Date.now()});closeRegisterModal();updateSessionUI();updateVipLevel();alert(`Đã đăng ký phiên ${selectedDate}`);}
+    function joinSession(){if(!state.registrations.find(r=>r.date===selectedDate))return alert('Chưa đăng ký phiên');document.getElementById('products').style.display='block';renderProducts();renderPendingSales();}
 
     // ===== Products & Buy =====
-    function renderProducts(){
-      const c=document.getElementById('productList');c.innerHTML='';
-      state.products.forEach(p=>{
-        const d=document.createElement('div');d.className='product';d.style.background=randomColor();
-        d.innerHTML=`<b>${p.name}</b><br>ID: ${p.id}<br>Giá: ${fmt(p.price)} SML<br><button class="small" onclick="confirmBuy('${p.id}')">Mua</button>`;
-        c.appendChild(d);
-      });
-    }
-    function confirmBuy(id){
-      // mua mới hay mua lại?
-      const p=state.products.find(x=>x.id===id);
-      const sale=state.pendingSales.find(x=>x.id===id);
-      if(!p&& !sale) return alert('Không tìm thấy sản phẩm');
-      let name, price, seller;
-      if(sale){
-        // mua từ chợ
-        name = sale.name; price = sale.salePrice; seller = sale.seller;
-        // remove từ pendingSales
-        state.pendingSales = state.pendingSales.filter(x=>x.id!==id);
-        // remove từ userNFT của seller
-        const idx = state.userNFT.findIndex(x=>x.id===id && x.status==='pendingSale');
-        if(idx>=0) state.userNFT.splice(idx,1);
-      } else {
-        // mua mới admin
-        name = p.name; price = p.price; seller = p.seller;
-        state.products = state.products.filter(x=>x.id!==id);
-      }
-      // thêm vào NFT của người mua
-      state.userNFT.push({ id, name, price, seller, status:'bought', postTime: sale? sale.postTime:null, sellDate: sale? sale.sellDate:null });
-      state.nftHistory.unshift({ id, name, price, time:new Date().toLocaleString('vi-VN'), action:'Mua' });
-      renderProducts();renderPendingSales();renderNFTs();renderNFTHistory();
-      alert(`Đã mua "${name}" giá ${fmt(price)} SML (chờ thanh toán).`);
-    }
+    function renderProducts(){const c=document.getElementById('productList');c.innerHTML='';state.products.forEach(p=>{const d=document.createElement('div');d.className='product';d.style.background=randomColor();d.innerHTML=`<b>${p.name}</b><br>ID: ${p.id}<br>Giá: ${fmt(p.price)} SML<br><button class="small" onclick="confirmBuy('${p.id}')">Mua</button>`;c.appendChild(d);});}
+    function confirmBuy(id){const p=state.products.find(x=>x.id===id);const sale=state.pendingSales.find(x=>x.id===id);if(!p&&!sale)return alert('Không tìm thấy sản phẩm');let name,price,seller; if(sale){name=sale.name;price=sale.salePrice;seller=sale.seller;state.pendingSales=state.pendingSales.filter(x=>x.id!==id);const idx=state.userNFT.findIndex(x=>x.id===id&&x.status==='pendingSale');if(idx>=0)state.userNFT.splice(idx,1);}else{name=p.name;price=p.price;seller=p.seller;state.products=state.products.filter(x=>x.id!==id);}state.userNFT.push({id,name,price,seller,status:'bought',postTime:sale? sale.postTime:null,sellDate:sale? sale.sellDate:null});state.nftHistory.unshift({id,name,price,time:new Date().toLocaleString('vi-VN'),action:'Mua'});renderProducts();renderPendingSales();renderNFTs();renderNFTHistory();alert(`Đã mua "${name}" giá ${fmt(price)} SML (chờ thanh toán).`);}   
 
     // ===== Pending Sales =====
-    function renderPendingSales(){
-      const c=document.getElementById('pendingSaleList');c.innerHTML='';
-      state.pendingSales.filter(s=>s.sellDate===selectedDate).forEach(s=>{
-        const d=document.createElement('div');d.className='sale-item';d.style.background=randomColor();
-        d.innerHTML=`
-          <b>${s.name}</b><br>
-          ID: ${s.id}<br>
-          Giá bán: ${fmt(s.salePrice)} SML<br>
-          Thời gian gửi bán: ${new Date(s.postTime).toLocaleString('vi-VN')}<br>
-          Phiên bán: ${s.sellDate}<br>
-          Người bán: ${s.seller}<br>
-          <button class="small" onclick="confirmBuy('${s.id}')">Mua lại</button>
-        `;
-        c.appendChild(d);
-      });
-    }
+    function renderPendingSales(){const c=document.getElementById('pendingSaleList');c.innerHTML='';state.pendingSales.filter(s=>s.sellDate===selectedDate).forEach(s=>{const d=document.createElement('div');d.className='sale-item';d.style.background=randomColor();d.innerHTML=`<b>${s.name}</b><br>ID: ${s.id}<br>Giá bán: ${fmt(s.salePrice)} SML<br>Thời gian gửi bán: ${new Date(s.postTime).toLocaleString('vi-VN')}<br>Phiên bán: ${s.sellDate}<br>Người bán: ${s.seller}<br><button class="small" onclick="confirmBuy('${s.id}')">Mua</button>`;c.appendChild(d);});}
 
     // ===== NFT Display =====
-    function renderNFTs(){
-      const c=document.getElementById('nftList');c.innerHTML='';let tot=0;
-      if(!state.userNFT.length){c.textContent='Chưa có sản phẩm.';document.getElementById('totalSpent').innerText='0';return;}
-      state.userNFT.forEach(it=>{
-        tot += it.price;
-        let extra='';
-        if(it.status==='bought'){
-          extra = `<p>Người bán: <b>${it.seller}</b></p>
-                   <button class="small" onclick="confirmPayment('${it.id}')">Thanh toán ${fmt(it.price)} SML</button>`;
-        } else if(it.status==='paid'){
-          extra = `<button class="small" onclick="initSell('${it.id}')">Bán</button>`;
-        } else if(it.status==='opened'){
-          extra = `<p>Hoàn ${fmt(it.refund)} SML</p>`;
-        } else if(it.status==='pendingSale'){
-          extra = `
-            <p>Giá bán: ${fmt(it.salePrice)} SML</p>
-            <p>Thời gian gửi bán: ${new Date(it.postTime).toLocaleString('vi-VN')}</p>
-            <p>Phiên bán: ${it.sellDate}</p>
-            <p>Người bán: <b>${it.seller}</b></p>
-            <p style="color:#ffc107;">(Đang treo bán)</p>
-          `;
-        }
-        const d=document.createElement('div');d.className='nft-item';d.style.background=randomColor();
-        d.innerHTML=`<b>${it.name}</b><br>ID: ${it.id}<br>${extra}`;
-        c.appendChild(d);
-      });
-      document.getElementById('totalSpent').innerText=fmt(tot);
-    }
-    function confirmPayment(id){
-      const it=state.userNFT.find(x=>x.id===id && x.status==='bought');
-      if(!it)return; if(state.walletBalance<it.price)return alert('Không đủ SML');
-      state.walletBalance -= it.price; updateWallet(); addWalletHistory(`Thanh toán ${it.name}`,-it.price);
-      it.status='paid';
-      state.nftHistory.unshift({id:it.id,name:it.name,price:it.price,time:new Date().toLocaleString('vi-VN'),action:'Thanh toán'});
-      renderNFTs();renderNFTHistory();
-    }
+    function renderNFTs(){const c=document.getElementById('nftList');c.innerHTML='';let tot=0;if(!state.userNFT.length){c.textContent='Chưa có sản phẩm.';document.getElementById('totalSpent').innerText='0';return;}state.userNFT.forEach(it=>{tot+=it.price;let extra='';if(it.status==='bought'){extra=`<p>Người bán: <b>${it.seller}</b></p><button class="small" onclick="confirmPayment('${it.id}')">Thanh toán ${fmt(it.price)} SML</button>`;}else if(it.status==='paid'){extra=`<button class="small" onclick="initSell('${it.id}')">Bán</button>`;}else if(it.status==='opened'){extra=`<p>Hoàn ${fmt(it.refund)} SML</p>`;}else if(it.status==='pendingSale'){extra=`<p>Giá bán: ${fmt(it.salePrice)} SML</p><p>Thời gian gửi bán: ${new Date(it.postTime).toLocaleString('vi-VN')}</p><p>Phiên bán: ${it.sellDate}</p><p>Người bán: <b>${it.seller}</b></p><p style="color:#ffc107;">(Đang treo bán)</p>`;}const d=document.createElement('div');d.className='nft-item';d.style.background=randomColor();d.innerHTML=`<b>${it.name}</b><br>ID: ${it.id}<br>${extra}`;c.appendChild(d);});document.getElementById('totalSpent').innerText=fmt(tot);}    
+    function confirmPayment(id){const it=state.userNFT.find(x=>x.id===id&&x.status==='bought');if(!it)return;if(state.walletBalance<it.price)return alert('Không đủ SML');state.walletBalance-=it.price;updateWallet();addWalletHistory(`Thanh toán ${it.name}`,-it.price);it.status='paid';state.nftHistory.unshift({id:it.id,name:it.name,price:it.price,time:new Date().toLocaleString('vi-VN'),action:'Thanh toán'});renderNFTs();renderNFTHistory();}
 
     // ===== Sell Flow =====
-    function initSell(id){
-      const it=state.userNFT.find(x=>x.id===id && x.status==='paid'); if(!it)return;
-      const profit=Math.floor(it.price*vipRate()/100),
-            fee=Math.ceil(it.price*0.034),
-            salePrice=it.price+profit+fee,
-            postTime=Date.now();
-      sellContext={it,profit,fee,salePrice,postTime};
-      document.getElementById('sellId').innerText=id;
-      document.getElementById('sellCost').innerText=fmt(it.price);
-      document.getElementById('sellProfit').innerText=fmt(profit);
-      document.getElementById('sellFee').innerText=fmt(fee);
-      document.getElementById('sellModal').classList.add('show');
-    }
+    function initSell(id){const it=state.userNFT.find(x=>x.id===id&&x.status==='paid');if(!it)return;const profit=Math.floor(it.price*vipRate()/100),fee=Math.ceil(it.price*0.034),salePrice=it.price+profit+fee,postTime=Date.now();sellContext={it,profit,fee,salePrice,postTime};document.getElementById('sellId').innerText=id;document.getElementById('sellCost').innerText=fmt(it.price);document.getElementById('sellProfit').innerText=fmt(profit);document.getElementById('sellFee').innerText=fmt(fee);document.getElementById('sellModal').classList.add('show');}
     function closeSellModal(){document.getElementById('sellModal').classList.remove('show');}
-    function confirmSell(){
-      const {it,profit,fee,salePrice,postTime}=sellContext;
-      if(state.walletBalance<fee)return alert('Không đủ phí');
-      state.walletBalance-=fee;updateWallet();addWalletHistory(`Phí gửi bán ${it.name}`,-fee);
-      // hoa hồng
-      const sLevel=parseInt(document.getElementById('sLevel').innerText.slice(1),10);
-      if(sLevel>=1){const teamComm=Math.ceil(salePrice*(parseFloat(document.getElementById('sCommissionRate').innerText)/100));state.rankCommission+=teamComm;}
-      const directComm=Math.ceil(salePrice*0.004);state.directCommission+=directComm;
-      // cập nhật item
-      it.status='pendingSale';it.salePrice=salePrice;it.postTime=postTime;it.sellDate=selectedDate;it.seller=currentUsername;
-      state.pendingSales.push({id:it.id,name:it.name,salePrice,seller:currentUsername,sellDate:selectedDate,postTime});
-      state.teamSales+=salePrice;updateSLevel();updateCommissionUI();
-      state.nftHistory.unshift({id:it.id,name:it.name,price:salePrice,time:new Date().toLocaleString('vi-VN'),action:'Gửi bán'});
-      renderNFTs();renderPendingSales();renderNFTHistory();
-      closeSellModal();alert(`Đã gửi bán "${it.name}" trong phiên ${selectedDate}`);
-    }
+    function confirmSell(){const {it,profit,fee,salePrice,postTime}=sellContext;if(state.walletBalance<fee)return alert('Không đủ phí');state.walletBalance-=fee;updateWallet();addWalletHistory(`Phí gửi bán ${it.name}`,-fee);const sLevel=parseInt(document.getElementById('sLevel').innerText.slice(1),10);if(sLevel>=1){const teamComm=Math.ceil(salePrice*(parseFloat(document.getElementById('sCommissionRate').innerText)/100));state.rankCommission+=teamComm;}const directComm=Math.ceil(salePrice*0.004);state.directCommission+=directComm;it.status='pendingSale';it.salePrice=salePrice;it.postTime=postTime;it.sellDate=(()=>{
+n=new Date();n.setDate(n.getDate()+1);return`${String(n.getDate()).padStart(2,'0')}/${String(n.getMonth()+1).padStart(2,'0')}`;})();it.seller=currentUsername;state.pendingSales.push({id:it.id,name:it.name,salePrice,seller:currentUsername,sellDate:it.sellDate,postTime});state.teamSales+=salePrice;updateSLevel();updateCommissionUI();state.nftHistory.unshift({id:it.id,name:it.name,price:salePrice,time:new Date().toLocaleString('vi-VN'),action:'Gửi bán'});renderNFTs();renderPendingSales();renderNFTHistory();closeSellModal();alert(`Đã gửi bán "${it.name}" trong phiên ${it.sellDate}`);}    
 
     // ===== Wallet/Deposit/Withdraw/Transfer/History =====
     function showDeposit(){document.getElementById('depositModal').classList.add('show');}
@@ -341,20 +206,18 @@
     function closeWithdrawModal(){document.getElementById('withdrawModal').classList.remove('show');}
     function submitWithdraw(){const v=parseFloat(document.getElementById('withdrawAmt').value);if(isNaN(v)||v<1000000)return alert('Min rút là 1 000 000');if(v>state.walletBalance)return alert('Số dư không đủ');state.requests.unshift({id:randomId(),type:'withdraw',sml:v,usdt:0,address:'',time:new Date().toLocaleString('vi-VN'),status:'pending'});renderRequestHistory();closeWithdrawModal();alert('Yêu cầu rút đã gửi.');}
 
-    function showTransfer(){document.getElementById('walletAction').innerHTML=`<h3>Chuyển nội bộ</h3><input id="transferTo" placeholder="ID thành viên"/><input id="transferAmt" type="number" placeholder="Số SML"/><button onclick="submitTransfer()">Chuyển</button>`;}
+    function showTransfer(){document.getElementById('walletAction').innerHTML=`<h3>Chuyển nội bộ</h3><input id="transferTo" placeholder="ID thành viên"/><input id="transferAmt" type="number" placeholder="Số SML"/><button onclick="submitTransfer()">Chuyển</button>`;}    
     function submitTransfer(){const to=document.getElementById('transferTo').value.trim(),amt=parseFloat(document.getElementById('transferAmt').value);if(isNaN(amt)||amt<=0)return alert('Số không hợp lệ');if(amt>state.walletBalance)return alert('Số dư không đủ');if(!state.members.includes(to))return alert('ID không tồn tại');state.walletBalance-=amt;updateWallet();addWalletHistory(`Chuyển cho ${to}`,-amt);document.getElementById('walletAction').innerHTML='';}
 
     function renderWalletHistory(){const c=document.getElementById('walletHistory');if(!state.walletHistory.length){c.textContent='Chưa có giao dịch.';return;}c.innerHTML=state.walletHistory.map(h=>`<div>${h.time}: <span class="${h.delta<0?'neg':'pos'}">${h.delta>0?'+':''}${fmt(h.delta)}</span> – ${h.desc}</div>`).join('');}
     function renderRequestHistory(){document.getElementById('requestHistory').innerHTML=state.requests.map(r=>`<tr><td>${r.type}</td><td>${fmt(r.sml)}</td><td>${r.usdt}</td><td>${r.address}</td><td>${r.time}</td><td>${r.status}</td></tr>`).join('');}
     function renderNFTHistory(){const ul=document.getElementById('nftHistory');if(!state.nftHistory.length){ul.textContent='Chưa có lịch sử.';return;}ul.innerHTML=state.nftHistory.map(x=>`<li>${x.time}: [${x.action}] ${x.name} — ${fmt(x.price)} SML</li>`).join('');}
 
-    // ===== VIP & S-Level =====
     function updateVipLevel(){const days=state.registrations.length,th=[0,10,20,40,60,90],rt=[1.5,1.6,1.7,1.8,1.9,2.0];let lvl=0;th.forEach((t,i)=>{if(days>=t)lvl=i;});document.getElementById('vipDays').innerText=days;document.getElementById('vipLevel').innerText='VIP'+lvl;document.getElementById('vipProfitRate').innerText=rt[lvl]+'%';}
     function updateSLevel(){const sales=state.teamSales,th=[0,58000000,150000000,1000000000,3000000000,7000000000],cm=[0,0.2,0.3,0.4,0.6,0.8];let lvl=0;th.forEach((t,i)=>{if(sales>=t)lvl=i;});document.getElementById('sLevel').innerText='S'+lvl;document.getElementById('sCommissionRate').innerText=cm[lvl]+'%';}
 
-    // ===== Commission Withdraw =====
     function withdrawDirect(){if(state.directCommission<=0)return alert('Không có hoa hồng trực tiếp.');state.walletBalance+=state.directCommission;addWalletHistory('Rút hoa hồng trực tiếp',+state.directCommission);state.directCommission=0;updateWallet();updateCommissionUI();}
-    function withdrawRank(){if(state.rankCommission<=0)return alert('Không có hoa hồng cấp bậc.');state.walletBalance+=state.rankCommission;addWalletHistory('Rút hoa hồng cấp bậc',+state.rankCommission);state.rankCommission=0;updateWallet();updateCommissionUI();}
+    function withdrawRank(){if(state.rankCommission<=0)return alert('Không có hoa hồng cấp bậc.');state.walletBalance+=state.rankCommission;addWalletHistory('Rút hoa hồn cấp bậc',+state.rankCommission);state.rankCommission=0;updateWallet();updateCommissionUI();}
 
     function saveProfile(){alert('Đã lưu thông tin');}
   </script>
