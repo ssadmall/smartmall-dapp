@@ -66,6 +66,7 @@
       <button id="btn-nft"     class="nav-btn"         onclick="showSection('nft')">🧾 NFT</button>
       <button id="btn-wallet"  class="nav-btn"         onclick="showSection('wallet')">💰 Ví</button>
       <button id="btn-profile" class="nav-btn"         onclick="showSection('profile')">👤 Thông tin</button>
+      <button id="btn-admin"  class="nav-btn"         onclick="showSection('admin')" style="display:none">🛠️ Admin</button>
     </nav>
 
     <!-- HOME -->
@@ -119,6 +120,17 @@
       <div id="ranks"><h3>🎖️ Cấp bậc</h3><p>VIP: <b id="vipLevel">VIP0</b> (<span id="vipDays">0</span> ngày)</p><p>Lợi nhuận: <b id="vipProfitRate">1.5%</b></p><hr style="border-color:#21e6c1;margin:6px 0;"><p>S-Level: <b id="sLevel">S0</b></p><p>Hoa hồng đội: <b id="sCommissionRate">0%</b></p></div>
     </section>
 
+    <!-- ADMIN -->
+    <section id="admin">
+      <h2>🛠️ Admin Panel</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Loại</th><th>SML</th><th>USDT</th><th>Địa chỉ</th><th>Thời gian</th><th>TT</th><th></th></tr>
+        </thead>
+        <tbody id="adminRequestTable"></tbody>
+      </table>
+    </section>
+
     <!-- MODALS -->
     <div class="modal" id="registerModal"><div class="modal-content"><h3>Phí đăng ký: 20 000 SML</h3><button onclick="confirmRegister()">Xác nhận</button><button onclick="closeRegisterModal()">Hủy</button></div></div>
     <div class="modal" id="sellModal"><div class="modal-content"><h3>Bán NFT</h3><p>ID: <span id="sellId"></span></p><p>Giá mua: <b id="sellCost"></b> SML</p><p>Lợi nhuận: <b id="sellProfit"></b> SML</p><p>Phí gửi bán: <b id="sellFee"></b> SML</p><button onclick="confirmSell()">Xác nhận</button><button onclick="closeSellModal()">Hủy</button></div></div>
@@ -144,7 +156,7 @@
       teamSales:0,
       members:[]  // nếu cần danh sách thành viên chuyển nội bộ
     };
-    let currentUsername='', selectedDate='', sellContext=null;
+    let currentUsername='', selectedDate='', sellContext=null, isAdmin=false;
     const fmt = n => n.toLocaleString('vi-VN');
     function randomId(){
       const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -179,6 +191,7 @@
       const u = document.getElementById('usernameInput').value.trim();
       if(!u) return alert('Nhập username!');
       currentUsername = u;
+      isAdmin = u.toLowerCase()==='admin';
       localStorage.setItem('sm_user', u);
       document.getElementById('login').style.display = 'none';
       document.getElementById('app').style.display   = 'block';
@@ -188,6 +201,7 @@
       const u = localStorage.getItem('sm_user');
       if(u){
         currentUsername = u;
+        isAdmin = u.toLowerCase()==='admin';
         document.getElementById('login').style.display = 'none';
         document.getElementById('app').style.display   = 'block';
         initApp();
@@ -205,6 +219,10 @@
         });
       });
       document.getElementById('profileUsername').innerText = currentUsername;
+      if(isAdmin){
+        document.getElementById('btn-admin').style.display='block';
+        renderAdminRequests();
+      }
       generateTabs(); updateWallet();
       renderProducts(); renderPendingSales(); renderNFTs();
       renderWalletHistory(); renderRequestHistory(); renderNFTHistory();
@@ -403,8 +421,11 @@
       const v = parseFloat(document.getElementById('depositSML').value);
       if(isNaN(v)||v<=0) return alert('Nhập số hợp lệ');
       const usdt = (v/state.usdtPrice).toFixed(4);
-      state.requests.unshift({id:randomId(),type:'deposit',sml:v,usdt,address:document.getElementById('depositAddress').innerText,time:new Date().toLocaleString('vi-VN'),status:'pending'});
-      renderRequestHistory(); closeDepositModal(); alert('Yêu cầu nạp đã gửi, chờ duyệt.');
+      state.requests.unshift({id:randomId(),type:'deposit',sml:v,usdt,address:document.getElementById('depositAddress').innerText,time:new Date().toLocaleString('vi-VN'),status:'pending',user:currentUsername});
+      renderRequestHistory();
+      renderAdminRequests();
+      alert('Yêu cầu nạp đã gửi, chờ duyệt.');
+      closeDepositModal();
     }
     function copyAddress(){ navigator.clipboard.writeText(document.getElementById('depositAddress').innerText).then(()=>alert('Đã sao chép!')); }
 
@@ -414,8 +435,11 @@
       const v = parseFloat(document.getElementById('withdrawAmt').value);
       if(isNaN(v)||v<1000000) return alert('Min rút là 1 000 000');
       if(v>state.walletBalance) return alert('Số dư không đủ');
-      state.requests.unshift({id:randomId(),type:'withdraw',sml:v,usdt:0,address:'',time:new Date().toLocaleString('vi-VN'),status:'pending'});
-      renderRequestHistory(); closeWithdrawModal(); alert('Yêu cầu rút đã gửi.');
+      state.requests.unshift({id:randomId(),type:'withdraw',sml:v,usdt:0,address:'',time:new Date().toLocaleString('vi-VN'),status:'pending',user:currentUsername});
+      renderRequestHistory();
+      renderAdminRequests();
+      closeWithdrawModal();
+      alert('Yêu cầu rút đã gửi.');
     }
 
     function showTransfer(){
@@ -457,6 +481,29 @@
             <td>${r.status}</td>
           </tr>
         `).join('');
+      renderAdminRequests();
+    }
+
+    function renderAdminRequests(){
+      if(!isAdmin) return;
+      document.getElementById('adminRequestTable').innerHTML =
+        state.requests.map(r=>`
+          <tr>
+            <td>${r.id}</td>
+            <td>${r.type}</td>
+            <td>${fmt(r.sml)}</td>
+            <td>${r.usdt||''}</td>
+            <td>${r.address||''}</td>
+            <td>${r.time}</td>
+            <td>${r.status}</td>
+            <td>${r.status==='pending'?`<button onclick="updateRequestStatus('${r.id}','confirmed')">✔</button><button onclick="updateRequestStatus('${r.id}','rejected')">✖</button>`:''}</td>
+          </tr>
+        `).join('');
+    }
+
+    function updateRequestStatus(id,status){
+      const r = state.requests.find(x=>x.id===id);
+      if(r){ r.status=status; renderRequestHistory(); }
     }
 
     function renderNFTHistory(){
