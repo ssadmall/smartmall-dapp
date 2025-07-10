@@ -243,5 +243,85 @@ n=new Date();n.setDate(n.getDate()+1);return`${String(n.getDate()).padStart(2,'0
 
     function saveProfile(){alert('Đã lưu thông tin');}
   </script>
+  <!-- Thêm Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+  const SUPA_URL = 'https://xyzcompany.supabase.co';      // sửa thành URL của bạn
+  const SUPA_KEY = 'eyJ...';                              // sửa thành anon key của bạn
+  const supabase = supabase.createClient(SUPA_URL, SUPA_KEY);
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+  tg.MainButton.text = 'Xác nhận';
+
+  // Lấy userId Telegram
+  const userId = 'tg_' + tg.initDataUnsafe.user.id;
+
+  // Load ví
+  async function loadWallet() {
+    const { data } = await supabase
+      .from('wallets')
+      .select('balance')
+      .eq('user_id', userId)
+      .single();
+    document.getElementById('walletBalance').innerText = data?.balance?.toLocaleString('vi-VN') || '0';
+  }
+
+  // Load lịch sử
+  async function loadHistory() {
+    const { data } = await supabase
+      .from('history')
+      .select('type, amount, time, meta')
+      .eq('user_id', userId)
+      .order('time', { ascending: false });
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.innerText = `${item.type}: ${item.amount>0?'+':''}${item.amount.toLocaleString('vi-VN')} VND — ${new Date(item.time).toLocaleString()}`;
+      list.append(li);
+    });
+  }
+
+  // Đăng ký phiên
+  tg.MainButton.onClick(async () => {
+    const date = document.getElementById('sessionDate').value;
+    // 1. Trừ 20.000 VND
+    await supabase
+      .from('wallets')
+      .upsert({ user_id: userId, balance: supabase.raw('balance - 20000') }, { onConflict: 'user_id' });
+    // 2. Thêm lịch sử
+    await supabase
+      .from('history')
+      .insert([{ user_id: userId, type: 'Phí đăng ký phiên', amount: -20000, meta: { date } }]);
+    // 3. Cập nhật lại giao diện
+    await loadWallet();
+    await loadHistory();
+    alert('Đăng ký thành công phiên ' + date);
+    tg.MainButton.hide();
+    document.getElementById('registerModal').style.display = 'none';
+  });
+
+  // Các event UI
+  document.getElementById('openRegisterModal').addEventListener('click', () => {
+    const d = document.getElementById('sessionDate').value;
+    if (!d) return alert('Chọn ngày trước khi đăng ký');
+    document.getElementById('modalDate').innerText = d;
+    document.getElementById('registerModal').style.display = 'flex';
+    tg.MainButton.show();
+  });
+  document.getElementById('closeRegisterModal').addEventListener('click', () => {
+    document.getElementById('registerModal').style.display = 'none';
+    tg.MainButton.hide();
+  });
+  document.getElementById('depositSMP').addEventListener('input', e => {
+    const v = parseFloat(e.target.value) || 0;
+    document.getElementById('requiredUSDT').innerText = (v / 23000).toFixed(4);
+  });
+
+  // Khởi tạo
+  loadWallet();
+  loadHistory();
+</script>
+
 </body>
 </html>
